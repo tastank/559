@@ -1,3 +1,9 @@
+// Draws a cube and axes
+// Author: T. A. Stank
+//
+//
+
+
 "use strict"
 
 var canvas = document.getElementById('main_canvas');
@@ -6,7 +12,17 @@ var ctx = canvas.getContext('2d');
 //flattens points into two dimensions
 var get2d_coords = function(point, camera_matrix, projection_matrix, viewport_matrix) {
     //TODO: this is where I need to change stuff
-    return new Point(point.x, point.y, 0);
+    //var proj = m4.multiply(viewport_matrix, projection_matrix);
+    //var final_matrix = m4.multiply(proj, camera_matrix);
+    var proj = m4.multiply(camera_matrix, projection_matrix);
+    var final_matrix = m4.multiply(viewport_matrix, proj);
+    var vec = v3.create();
+    vec[0] = point.x;
+    vec[1] = point.y;
+    vec[2] = point.z;
+//    vec = [point.x, point.y, point.z];
+    var transformed_point = m4.transformPoint(final_matrix, vec);
+    return new Point(transformed_point[0], transformed_point[1], 0);
 }
 
 var line = function(p1, p2, camera_matrix, projection_matrix, viewport_matrix) {
@@ -28,6 +44,7 @@ var yrot_slider = document.getElementById('yrot_slider');
 var zrot_slider = document.getElementById('zrot_slider');
 
 var m4 = twgl.m4;
+var v3 = twgl.v3;
 
 var corner1 = new Point(-1, -1, -1);
 var corner2 = new Point(1,1,1);
@@ -52,9 +69,24 @@ function draw() {
 
     //Do our transformations
     var camera_matrix = m4.identity();
+    var camera_translation = v3.create();
+    camera_translation[0] = x_slider.value;
+    camera_translation[1] = y_slider.value;
+    camera_translation[2] = z_slider.value;
+    m4.translate(camera_matrix, camera_translation, camera_matrix);
+    m4.rotateX(camera_matrix, xrot_slider.value, camera_matrix);
+    m4.rotateY(camera_matrix, yrot_slider.value, camera_matrix);
+    m4.rotateZ(camera_matrix, zrot_slider.value, camera_matrix);
     var projection_matrix = m4.identity();
+    projection_matrix = m4.frustum(-1, 1, -1, 1, 1, -1);
     //I believe this will remain identity, as the cube's coords are in world coords
     var viewport_matrix = m4.identity();
+    var viewport_translation = v3.create();
+    viewport_translation[0] = 0;
+    viewport_translation[1] = 0;
+    viewport_translation[2] = 4;
+    m4.translate(viewport_matrix, viewport_translation, viewport_matrix);
+
 
     
     var o = new Point(0, 0, 0);
