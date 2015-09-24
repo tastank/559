@@ -1,18 +1,13 @@
-class point {
-    var x;
-    var y;
-    var z;
+"use strict"
+var point = function(x,y,z) {
+    this.x = x;
+    this.y = y;
+    this.z = z;
+};
 
-    constructor(x,y,z) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
-    }
-
-    function set(x,y,z) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
-    }
-
+point.prototype.set = function(x,y,z) {
+    this.x = x;
+    this.y = y;
+    this.z = z;
 }
+
