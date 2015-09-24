@@ -19,4 +19,30 @@ var corner1 = new point(-1, -1, -1);
 var corner2 = new point(1,1,1);
 var cube = new rprism(corner1, corner2);
 
-viewportMatrix = new m4
+
+
+//here's where we draw shit
+
+function draw() {
+    ctx.clearRect(0, 0, main_canvas.width, main_canvas.height);
+
+    //window now ranges from (0, 0) to (2.667, 2);
+    ctx.scale(240, 240);
+    //window now ranges from (-1.333, -1) to (1.333, 1);
+    ctx.translate(320, 240);
+    //Orientation is now correct
+    ctx.scale(1, -1);
+
+    //Do our transformations
+
+
+
+
+    cube.draw();
+
+    update();
+    window.requestAnimationFrame(draw);
+}
+
+
+
