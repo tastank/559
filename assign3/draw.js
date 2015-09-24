@@ -70,15 +70,16 @@ function draw() {
     //Do our transformations
     var camera_matrix = m4.identity();
     var camera_translation = v3.create();
-    camera_translation[0] = x_slider.value;
-    camera_translation[1] = y_slider.value;
-    camera_translation[2] = z_slider.value;
+    //There has to be a better way, but my other ideas didn't work and this does.
+    camera_translation[0] = -x_slider.value;
+    camera_translation[1] = -y_slider.value;
+    camera_translation[2] = -z_slider.value;
     m4.translate(camera_matrix, camera_translation, camera_matrix);
     m4.rotateX(camera_matrix, xrot_slider.value, camera_matrix);
-    m4.rotateY(camera_matrix, yrot_slider.value, camera_matrix);
-    m4.rotateZ(camera_matrix, zrot_slider.value, camera_matrix);
+    m4.rotateY(camera_matrix, -yrot_slider.value, camera_matrix);
+    m4.rotateZ(camera_matrix, -zrot_slider.value, camera_matrix);
     var projection_matrix = m4.identity();
-    projection_matrix = m4.frustum(-1, 1, -1, 1, 1, -1);
+    projection_matrix = m4.frustum(-1, 1, -1, 1, -1, 1);
     //I believe this will remain identity, as the cube's coords are in world coords
     var viewport_matrix = m4.identity();
     var viewport_translation = v3.create();
