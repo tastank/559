@@ -47,11 +47,13 @@ function draw() {
     ctx.scale(1, -1);
 
     //Do our transformations
+    var camera_matrix = m4.identity();
+    var projection_matrix = m4.identity();
+    //I believe this will remain identity, as the cube's coords are in world coords
+    var viewport_matrix = m4.identity();
 
 
-
-
-    cube.draw();
+    cube.draw(camera_matrix, projection_matrix, viewport_matrix);
 
     update();
     window.requestAnimationFrame(draw);
