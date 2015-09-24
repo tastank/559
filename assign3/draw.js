@@ -38,14 +38,17 @@ var cube = new Rprism(corner1, corner2);
 //here's where we draw shit
 
 function draw() {
+    ctx.save();
     ctx.clearRect(0, 0, main_canvas.width, main_canvas.height);
 
-    //window now ranges from (0, 0) to (2.667, 2);
-    ctx.scale(240, 240);
-    //window now ranges from (-1.333, -1) to (1.333, 1);
-    ctx.translate(320, 240);
+    //window now ranges from (0, 0) to ();
+    ctx.scale(100, 100);
+    //window now ranges from (-2, -2) to (2, 2);
+    ctx.translate(2, 2);
     //Orientation is now correct
     ctx.scale(1, -1);
+
+    ctx.lineWidth = 0.01;
 
     //Do our transformations
     var camera_matrix = m4.identity();
@@ -53,11 +56,18 @@ function draw() {
     //I believe this will remain identity, as the cube's coords are in world coords
     var viewport_matrix = m4.identity();
 
-
+    
+    var o = new Point(0, 0, 0);
+    var x = new Point(1, 0, 0);
+    var y = new Point(0, 1, 0);
+    var z = new Point(0, 0, 1);
+    line(o, x, camera_matrix, projection_matrix, viewport_matrix);
+    line(o, y, camera_matrix, projection_matrix, viewport_matrix);
+    line(o, z, camera_matrix, projection_matrix, viewport_matrix);
     cube.draw(camera_matrix, projection_matrix, viewport_matrix);
 
-    update();
     window.requestAnimationFrame(draw);
+    ctx.restore();
 }
 
 draw();
