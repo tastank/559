@@ -27,6 +27,7 @@ var xrot_slider = document.getElementById('xrot_slider');
 var yrot_slider = document.getElementById('yrot_slider');
 var zrot_slider = document.getElementById('zrot_slider');
 
+var m4 = twgl.m4;
 
 var corner1 = new Point(-1, -1, -1);
 var corner2 = new Point(1,1,1);
