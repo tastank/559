@@ -1,0 +1,36 @@
+<html>
+<head>
+<title>Assignment 4: Canvas</title>
+</head>
+<body>
+<canvas id="main_canvas" width="400" height="400" style="border: 1px solid black;"></canvas><br />
+<table>
+<tr>
+<td>x: </td><td><input id="x_slider" type="range" min="-4" max="4" step=".05" /></td>
+</tr><tr>
+<td>y: </td><td><input id="y_slider" type="range" min="-4" max="4" step=".05" /></td>
+</tr><tr>
+<td>z: </td><td><input id="z_slider" type="range" min="-8" max="-4" step=".05" /></td>
+</tr><tr>
+<td>x rotation: </td><td><input id="xrot_slider" type="range" min="-1.2" max="1.2" step=".02" /></td>
+</tr><tr>
+<td>y rotation: </td><td><input id="yrot_slider" type="range" min="-1.2" max="1.2" step=".02" /></td>
+</tr><tr>
+<td>z rotation: </td><td><input id="zrot_slider" type="range" min="-3.14" max="3.14" step=".02" /></td>
+</tr><tr>
+<td>speed: </td><td><input id="speed_slider" type="range" min="-0.01" max="0.01" step=".002" /></td>
+</tr><tr>
+<td>sort: </td><td><input id="sort_slider" type="range" min="0" max="1" step="1" /></td>
+</tr><tr>
+<td>wireframe: </td><td><input id="wireframe_slider" type="range" min="0" max="1" step="1" /></td>
+</tr>
+</table>
+<!--Thanks profs for the tip in your sample file-->
+<script type="text/javascript" src="http://graphics.cs.wisc.edu/JS/twgl-full.min.js"></script>
+<script type="text/javascript" src="Point.js"></script>
+<script type="text/javascript" src="Tri.js"></script>
+<script type="text/javascript" src="Rprism.js"></script>
+<script type="text/javascript" src="draw.js"></script>
+
+</body>
+</html>
