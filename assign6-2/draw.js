@@ -16,9 +16,9 @@ function start() {
   "use strict";
 
   // first we need to get the canvas and make an OpenGL context
-    // in practice, you need to do error checking
+  // in practice, you need to do error checking
   var canvas = document.getElementById("main_canvas");
-    var gl = canvas.getContext("webgl");
+  var gl = canvas.getContext("webgl");
 
 
   //these shaders are based on the lighting model discussed in class, but are of my own creation
@@ -65,6 +65,7 @@ function start() {
 //this should do everything the above did, while allowing me to put the shaders
 //in separate script files for readability
   var shaderProgram = createProgramFromScripts(gl, "vert-shader", "frag-shader");
+  gl.useProgram(shaderProgram);     
 
   // with the vertex shader, we need to pass it positions
   // as an attribute - so set up that communication
@@ -78,9 +79,17 @@ function start() {
     "a_color"
   ];
 
+  var uniforms = [
+    "u_normal_matrix",
+    "u_modelview_matrix",
+    "u_projection_matrix"
+  ];
+
+/*Turns out this isn't necessary
   gl.bindAttribLocation(shaderProgram, 0, "a_position");
   gl.bindAttribLocation(shaderProgram, 1, "a_normal");
   gl.bindAttribLocation(shaderProgram, 2, "a_color");
+*/
 
   shaderProgram.vertex_position = gl.getAttribLocation(shaderProgram, "a_position");
   shaderProgram.normal_vector   = gl.getAttribLocation(shaderProgram, "a_normal");
@@ -90,22 +99,40 @@ function start() {
   gl.enableVertexAttribArray(shaderProgram.normal_vector);
   gl.enableVertexAttribArray(shaderProgram.color);
 
-  var num_tris = 2;
-  var num_vertices = num_tris*3;
+  shaderProgram.normal_matrix     = gl.getUniformLocation(shaderProgram, "u_normal_matrix");
+  shaderProgram.modelview_matrix  = gl.getUniformLocation(shaderProgram, "u_modelview_matrix");
+  shaderProgram.projection_matrix = gl.getUniformLocation(shaderProgram, "u_projection_matrix");
+
 
   // now that we have programs to run on the hardware, we can 
   // make our triangle
 
   // let's define the vertex positions
-  var vertexPos = [
-         0.0,  1.0,  0.0,
-        -1.0, -1.0,  0.0,
-         1.0, -1.0,  0.0,
 
-        -1.0, 1.0, 0.0,
-        -1.0, 0.0, 0.0,
-        -0.5, 0.0, 0.0
-  ];  
+
+  var vertexPos = [];
+  var normalVecs = [];
+  var colors = [];
+
+  var cube = new Rprism(new Point(-1, -1, -1), new Point(1, 1, 1));
+  var tris = cube.getTris();
+
+  var num_tris = tris.length;
+  var num_vertices = num_tris*3;
+  
+  for (var i = 0; i < tris.length; i++) {
+    vertexPos  = vertexPos.concat(tris[i].getVertexArray());
+    //do for each vertex
+    normalVecs = normalVecs.concat(tris[i].getNormal());
+    normalVecs = normalVecs.concat(tris[i].getNormal());
+    normalVecs = normalVecs.concat(tris[i].getNormal());
+
+    //also for each vertex
+    colors = colors.concat([1.0, 1.0, 1.0]);
+    colors = colors.concat([1.0, 1.0, 1.0]);
+    colors = colors.concat([1.0, 1.0, 1.0]);
+  }
+  
 
   // we need to put the vertices into a buffer so we can
   // block transfer them to the graphics hardware
@@ -117,37 +144,13 @@ function start() {
   //I have to do this elsewhere though
   //gl.vertexAttribPointer(shaderProgram.vertex_position, vertex_buffer.itemSize, gl.FLOAT, gl.FALSE, 0, 0);
 
-
   //do the same for normals
-
-  // define the normals
-  //TODO: actually calculate the normals
-  var normalVecs = [
-      0.0, 0.0, 1.0,
-      0.0, 0.0, 1.0,
-      0.0, 0.0, 1.0,
-
-      1.0, 0.0, 1.0,
-      1.0, 0.0, 1.0,
-      1.0, 0.0, 1.0
-  ];
-
   var normal_buffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, normal_buffer);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(normalVecs), gl.STATIC_DRAW);
   normal_buffer.itemSize = 3;
   normal_buffer.numItems = num_vertices;
   //gl.vertexAttribPointer(shaderProgram.normal_vector, normal_buffer.itemSize, gl.FLOAT, gl.FALSE, 0, 0);
-
-  var colors = [
-    0.0, 0.0, 1.0,
-    0.0, 1.0, 1.0,
-    1.0, 1.0, 1.0,
-
-    1.0, 0.0, 0.0,
-    1.0, 0.0, 0.0,
-    1.0, 0.0, 0.0
-  ];
 
   var color_buffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, color_buffer);
@@ -156,41 +159,70 @@ function start() {
   color_buffer.numItems = num_vertices;
   //gl.vertexAttribPointer(shaderProgram.color, color_buffer.itemSize, gl.FLOAT, gl.FALSE, 0, 0);
 
-  draw();
+  var m4 = twgl.m4;
+  var v3 = twgl.v3;
 
-}
+  //set up our transformation matrices
+
+  //why don't I have functions like gl_frustum provided by OpenGL?  This is lame.
+  //TWGL to the rescue!
+  var projection_matrix = m4.perspective(90*Math.PI/180, 1, 0.1, 10);
+  //to be honest, I'm not sure what transformations to apply to these.
+  //var modelview_matrix  = m4.identity();
+  var modelview_matrix = m4.inverse(m4.lookAt(
+    [0.0, 0.0, 3.0],
+    [0.0, 0.0, -1.0],
+    [0.0, 1.0, 0.0]
+  ));
+  var normal_matrix     = m4.identity();
 
 
-
-
-function draw() {    
-  // this is the "draw scene" function, but since this 
-  // is execute once...
-  
+  function draw() {    
+    // this is the "draw scene" function, but since this 
+    // is execute once...
+    
     // first, let's clear the screen
-  gl.clearColor(0.0, 0.0, 0.0, 1.0);
-  gl.enable(gl.DEPTH_TEST);
+    gl.clearColor(0.0, 0.0, 0.0, 1.0);
+    gl.enable(gl.DEPTH_TEST);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-  // now we draw the triangle
-  // we tell GL what program to use, and what memory block
-  // to use for the data, and that the data goes to the pos
-  // attribute
-  gl.useProgram(shaderProgram);     
+    // now we draw the triangle
+    // we tell GL what program to use, and what memory block
+    // to use for the data, and that the data goes to the pos
+    // attribute
+    //gl.useProgram(shaderProgram);     
 
-  gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer);
-  gl.vertexAttribPointer(shaderProgram.vertex_position, vertex_buffer.itemSize, gl.FLOAT, gl.FALSE, 0, 0);
+    modelview_matrix = m4.rotateX(modelview_matrix, 0.01);   
+    normal_matrix = m4.rotateX(normal_matrix, 0.01);
 
-  gl.bindBuffer(gl.ARRAY_BUFFER, normal_buffer);
-  gl.vertexAttribPointer(shaderProgram.normal_vector, normal_buffer.itemSize, gl.FLOAT, gl.FALSE, 0, 0);
+    gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer);
+    gl.vertexAttribPointer(shaderProgram.vertex_position, vertex_buffer.itemSize, gl.FLOAT, gl.FALSE, 0, 0);
 
-  gl.bindBuffer(gl.ARRAY_BUFFER, color_buffer);
-  gl.vertexAttribPointer(shaderProgram.color, color_buffer.itemSize, gl.FLOAT, gl.FALSE, 0, 0);
+    gl.bindBuffer(gl.ARRAY_BUFFER, normal_buffer);
+    gl.vertexAttribPointer(shaderProgram.normal_vector, normal_buffer.itemSize, gl.FLOAT, gl.FALSE, 0, 0);
 
-  gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer);
+    gl.bindBuffer(gl.ARRAY_BUFFER, color_buffer);
+    gl.vertexAttribPointer(shaderProgram.color, color_buffer.itemSize, gl.FLOAT, gl.FALSE, 0, 0);
 
-  gl.drawArrays(gl.TRIANGLES, 0, vertex_buffer.numItems);
-  window.requestAnimationFrame(draw);
-}
+    gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer);
+
+    gl.uniformMatrix4fv(shaderProgram.projection_matrix, gl.FALSE, projection_matrix);
+    gl.uniformMatrix4fv(shaderProgram.modelview_matrix,  gl.FALSE, modelview_matrix);
+    gl.uniformMatrix4fv(shaderProgram.normal_matrix,     gl.FALSE, normal_matrix);
+
+    gl.drawArrays(gl.TRIANGLES, 0, vertex_buffer.numItems);
+
+    //firefox keeps optimizing out my variables.  some optimizer they've got.
+    NOP(normalVecs);
+    NOP(colors);
+    NOP(vertexPos);
+
+    window.requestAnimationFrame(draw);
+
+  };
+
+  draw();
   
-start();
+}
+
+function NOP() {}
