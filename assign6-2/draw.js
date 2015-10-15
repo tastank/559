@@ -71,47 +71,25 @@ function start() {
   //shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "position");
   //gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
   
+
+  var attributes = [
+    "a_position",
+    "a_normal",
+    "a_color"
+  ];
+
   gl.bindAttribLocation(shaderProgram, 0, "a_position");
   gl.bindAttribLocation(shaderProgram, 1, "a_normal");
+  gl.bindAttribLocation(shaderProgram, 2, "a_color");
 
+  shaderProgram.vertex_position = gl.getAttribLocation(shaderProgram, "a_position");
+  shaderProgram.normal_vector   = gl.getAttribLocation(shaderProgram, "a_normal");
+  shaderProgram.color           = gl.getAttribLocation(shaderProgram, "a_color");
 
+  gl.enableVertexAttribArray(shaderProgram.vertex_position);
+  gl.enableVertexAttribArray(shaderProgram.normal_vector);
+  gl.enableVertexAttribArray(shaderProgram.color);
 
-
-/* TODO: looks like I can stand to lose this.  Let's see if that's true.
-  var vertex_shader   = createShaderFromScript(gl, "vert-shader");
-  var fragment_shader = createShaderFromScript(gl, "frag-shader");
-
-  //The following (through the next comment specifying otherwise) is a snippet from
-  //gl.js - it doesn't allow the customization I need.  See gl.js for attribution information
-  var shaderProgram = gl.createProgram();
-
-  // attach the shaders.
-  gl.attachShader(program, vertexShader);
-  gl.attachShader(program, fragmentShader);
- 
-  // link the program.
-  gl.linkProgram(program);
- 
-  // Check if it linked.
-  var success = gl.getProgramParameter(program, gl.LINK_STATUS);
-  if (!success) {
-      // something went wrong with the link
-      throw ("program filed to link:" + gl.getProgramInfoLog (program));
-  }
-
-  if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
-    alert("Could not initialise shaders");
-  }*/
-
-
-  var vertex_position = gl.getAttribLocation(shaderProgram, "a_position");
-  var normal_vector   = gl.getAttribLocation(shaderProgram, "a_normal");
-  if (normal_vector == -1) {
-    console.log("Shit's fucked.");
-  }
-
-  var vertex_buffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer);
 
   // now that we have programs to run on the hardware, we can 
   // make our triangle
@@ -123,35 +101,47 @@ function start() {
          1.0, -1.0,  0.0
   ];  
 
-  gl.bufferData(gl.ARRAY_BUFFER, vertexPos, gl.STATIC_DRAW);
-  gl.enableVertexAttribArray(vertex_position);
-  gl.vertexAttribPointer(vertex_position, 3, gl.FLOAT, gl.FALSE, 0, 0);
+  // we need to put the vertices into a buffer so we can
+  // block transfer them to the graphics hardware
+  var vertex_buffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexPos), gl.STATIC_DRAW);
+  vertex_buffer.itemSize = 3;
+  vertex_buffer.numItems = 3;
+  //I have to do this elsewhere though
+  //gl.vertexAttribPointer(shaderProgram.vertex_position, vertex_buffer.itemSize, gl.FLOAT, gl.FALSE, 0, 0);
+
 
   //do the same for normals
-  var normal_buffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, normal_buffer);
 
-  // let's define the normal positions
+  // define the normals
   var normalVecs = [
       0.0, 0.0, 1.0,
       0.0, 0.0, 1.0,
       0.0, 0.0, 1.0
   ];
 
-  gl.bufferData(gl.ARRAY_BUFFER, normalVecs, gl.STATIC_DRAW);
-  gl.enableVertexAttribArray(normal_vector);
-  gl.vertexAttribPointer(normal_vector, 3, gl.FLOAT, gl.FALSE, 0, 0);
+  var normal_buffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, normal_buffer);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(normalVecs), gl.STATIC_DRAW);
+  normal_buffer.itemSize = 3;
+  normal_buffer.numItems = 3;
+  //gl.vertexAttribPointer(shaderProgram.normal_vector, normal_buffer.itemSize, gl.FLOAT, gl.FALSE, 0, 0);
 
+  var colors = [
+    0.0, 0.0, 1.0,
+    0.0, 1.0, 1.0,
+    1.0, 1.0, 1.0
+  ];
+
+  var color_buffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, color_buffer);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
+  color_buffer.itemSize = 3;
+  color_buffer.numItems = 3;
+  //gl.vertexAttribPointer(shaderProgram.color, color_buffer.itemSize, gl.FLOAT, gl.FALSE, 0, 0);
 
   
-  
-  // we need to put the vertices into a buffer so we can
-  // block transfer them to the graphics hardware
-    var trianglePosBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, trianglePosBuffer);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexPos), gl.STATIC_DRAW);
-    trianglePosBuffer.itemSize = 3;
-    trianglePosBuffer.numItems = 3;
 
 
     
@@ -168,9 +158,19 @@ function start() {
   // to use for the data, and that the data goes to the pos
   // attribute
   gl.useProgram(shaderProgram);     
-  gl.bindBuffer(gl.ARRAY_BUFFER, trianglePosBuffer);
-  gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, trianglePosBuffer.itemSize, gl.FLOAT, false, 0, 0);
-  gl.drawArrays(gl.TRIANGLES, 0, 3);
+
+  gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer);
+  gl.vertexAttribPointer(shaderProgram.vertex_position, vertex_buffer.itemSize, gl.FLOAT, gl.FALSE, 0, 0);
+
+  gl.bindBuffer(gl.ARRAY_BUFFER, normal_buffer);
+  gl.vertexAttribPointer(shaderProgram.normal_vector, normal_buffer.itemSize, gl.FLOAT, gl.FALSE, 0, 0);
+
+  gl.bindBuffer(gl.ARRAY_BUFFER, color_buffer);
+  gl.vertexAttribPointer(shaderProgram.color, color_buffer.itemSize, gl.FLOAT, gl.FALSE, 0, 0);
+
+  gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer);
+
+  gl.drawArrays(gl.TRIANGLES, 0, vertex_buffer.numItems);
 }
   
 start();
