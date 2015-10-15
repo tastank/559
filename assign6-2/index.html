@@ -2,7 +2,6 @@
 <head>
 <title>Assignment 6: WebGL</title>
 </head>
-<script type="text/javascript" src="http://graphics.cs.wisc.edu/JS/twgl-full.min.js"></script>
 <script type="x-shader/x-vertex" id="vert-shader">
 //glsl shaders!
 
@@ -76,6 +75,10 @@ void main(void) {
   gl_FragColor = vec4(color, 1.0);
 }
 </script>
+<script type="text/javascript" src="http://graphics.cs.wisc.edu/JS/twgl-full.min.js"></script>
+<script type="text/javascript" src="Point.js"></script>
+<script type="text/javascript" src="Tri.js"></script>
+<script type="text/javascript" src="Rprism.js"></script>
 <script type="text/javascript" src="gl.js"></script>
 <script type="text/javascript" src="draw.js"></script>
 <body onload="start()">
