@@ -10,7 +10,7 @@ Rprism.prototype.set = function(c1, c2) {
     this.c2 = c2;
 }
 
-Rprism.prototype.draw = function(ctx, sort, wireframe, camera_matrix, projection_matrix, viewport_matrix) {
+Rprism.prototype.getTris = function() {
     //this will be fun
     //calculate corners
     var p1 = new Point(this.c1.x, this.c1.y, this.c1.z);
@@ -37,5 +37,6 @@ Rprism.prototype.draw = function(ctx, sort, wireframe, camera_matrix, projection
         new Tri(p6, p7, p8)
     ];
 
+    return tris;
 
 }
