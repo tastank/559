@@ -90,6 +90,8 @@ function start() {
   gl.enableVertexAttribArray(shaderProgram.normal_vector);
   gl.enableVertexAttribArray(shaderProgram.color);
 
+  var num_tris = 2;
+  var num_vertices = num_tris*3;
 
   // now that we have programs to run on the hardware, we can 
   // make our triangle
@@ -98,7 +100,11 @@ function start() {
   var vertexPos = [
          0.0,  1.0,  0.0,
         -1.0, -1.0,  0.0,
-         1.0, -1.0,  0.0
+         1.0, -1.0,  0.0,
+
+        -1.0, 1.0, 0.0,
+        -1.0, 0.0, 0.0,
+        -0.5, 0.0, 0.0
   ];  
 
   // we need to put the vertices into a buffer so we can
@@ -107,7 +113,7 @@ function start() {
   gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexPos), gl.STATIC_DRAW);
   vertex_buffer.itemSize = 3;
-  vertex_buffer.numItems = 3;
+  vertex_buffer.numItems = num_vertices;
   //I have to do this elsewhere though
   //gl.vertexAttribPointer(shaderProgram.vertex_position, vertex_buffer.itemSize, gl.FLOAT, gl.FALSE, 0, 0);
 
@@ -115,36 +121,49 @@ function start() {
   //do the same for normals
 
   // define the normals
+  //TODO: actually calculate the normals
   var normalVecs = [
       0.0, 0.0, 1.0,
       0.0, 0.0, 1.0,
-      0.0, 0.0, 1.0
+      0.0, 0.0, 1.0,
+
+      1.0, 0.0, 1.0,
+      1.0, 0.0, 1.0,
+      1.0, 0.0, 1.0
   ];
 
   var normal_buffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, normal_buffer);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(normalVecs), gl.STATIC_DRAW);
   normal_buffer.itemSize = 3;
-  normal_buffer.numItems = 3;
+  normal_buffer.numItems = num_vertices;
   //gl.vertexAttribPointer(shaderProgram.normal_vector, normal_buffer.itemSize, gl.FLOAT, gl.FALSE, 0, 0);
 
   var colors = [
     0.0, 0.0, 1.0,
     0.0, 1.0, 1.0,
-    1.0, 1.0, 1.0
+    1.0, 1.0, 1.0,
+
+    1.0, 0.0, 0.0,
+    1.0, 0.0, 0.0,
+    1.0, 0.0, 0.0
   ];
 
   var color_buffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, color_buffer);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
   color_buffer.itemSize = 3;
-  color_buffer.numItems = 3;
+  color_buffer.numItems = num_vertices;
   //gl.vertexAttribPointer(shaderProgram.color, color_buffer.itemSize, gl.FLOAT, gl.FALSE, 0, 0);
 
-  
+  draw();
+
+}
 
 
-    
+
+
+function draw() {    
   // this is the "draw scene" function, but since this 
   // is execute once...
   
@@ -171,6 +190,7 @@ function start() {
   gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer);
 
   gl.drawArrays(gl.TRIANGLES, 0, vertex_buffer.numItems);
+  window.requestAnimationFrame(draw);
 }
   
 start();
