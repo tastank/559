@@ -20,64 +20,13 @@ function start() {
   var canvas = document.getElementById("main_canvas");
     var gl = canvas.getContext("webgl");
 
-  // now we have to program the hardware
-  // we need to have our GLSL code somewhere
-  // putting it in strings is bad - but it's easy so I'll
-  // do it for now
+
   //these shaders are based on the lighting model discussed in class, but are of my own creation
-  var vertexSource = ""+
-/*"precision highp float;"+
-"attribute vec3 position;"+
-"attribute vec3 normal;"+
-"uniform mat3 normalMatrix;"+
-"uniform mat4 modelViewMatrix;"+
-"uniform mat4 projectionMatrix;"+
-"varying vec3 fNormal;"+
-
-"void main()"+
-"{"+
-  "fNormal = normalize(normalMatrix * normal);"+
-  "vec4 pos = modelViewMatrix * vec4(position, 1.0);"+
-  "gl_Position = projectionMatrix * pos;"+
-"}";*/
-"attribute vec3 position;" +
-"void main(void) {" + 
-"  gl_Position = vec4(position, 1.0);" +
-"}";
+  //I have put shaders in their own files and used a script tag to include them,
+  //and a function which does the document.getElementById business (which I borrowed
+  //from elsewhere) for me, so there's nothing to do with the shaders here!
 
 
-  var fragmentSource = "" +
-/*"precision highp float;"+
-"uniform float time;"+
-"uniform vec2 resolution;"+
-"varying vec3 fPosition;"+
-"varying vec3 fNormal;"+
-
-"vec3 eye_pos = vec3(0.0, 0.0, 1.0);"+
-"vec3 specular_light = vec3(0.0, 1.0, 1.0);"+
-"vec3 specular_color = vec3(1.0, 0., 0.0);"+
-"vec3 halfway = normalize(eye_pos + specular_light);"+
-"float shininess = 0.0;"+
-
-"vec3 diffuse_light = vec3(0.0, 1.0, 1.0);"+
-"vec3 diffuse_color = vec3(1.0, 0.0, 0.0);"+
-
-"void main()"+
-"{"+
-"  float specular_shade = pow(dot(fNormal, halfway), shininess);"+
-"  float diffuse_shade = dot(diffuse_light, fNormal);"+
-  
-  
-"  float ambient_shade = 0.2;"+
-"  vec3 specular_fragcolor = specular_shade*specular_color;"+
-"  vec3 diffuse_fragcolor = (diffuse_shade + ambient_shade)*diffuse_color;"+
-"  float specularness = 0.5;"+
-"  vec3 color = (specular_fragcolor*specularness + diffuse_fragcolor*(1.0-specularness))/(1.0 + ambient_shade);"+
-"  gl_FragColor = vec4(color, 1.0);"+
-"}";*/
-"void main(void) {" +
-"  gl_FragColor = vec4(1.0, 1.0, 0.0, 1.0);" +
-"}";
   
   // now we need to make those programs into
   // "Shader Objects" - by running the compiler
@@ -86,7 +35,7 @@ function start() {
   //   attach the source code
   //   run the compiler
   //   check for errors
-  
+ /* 
   // first compile the vertex shader
   var vertexShader = gl.createShader(gl.VERTEX_SHADER);
   gl.shaderSource(vertexShader,vertexSource);
@@ -106,24 +55,64 @@ function start() {
           alert(gl.getShaderInfoLog(fragmentShader));
           return null;
       }
-
+*/
   // OK, we have a pair of shaders, we need to put them together
   // into a "shader program" object
-  var shaderProgram = gl.createProgram();
-  gl.attachShader(shaderProgram, vertexShader);
-  gl.attachShader(shaderProgram, fragmentShader);
-  gl.linkProgram(shaderProgram);
-
-  if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
-    alert("Could not initialise shaders");
-  }
+//  var shaderProgram = gl.createProgram();
+//  gl.attachShader(shaderProgram, vertexShader);
+//  gl.attachShader(shaderProgram, fragmentShader);
+//  gl.linkProgram(shaderProgram);
+//this should do everything the above did, while allowing me to put the shaders
+//in separate script files for readability
+  var shaderProgram = createProgramFromScripts(gl, "vert-shader", "frag-shader");
 
   // with the vertex shader, we need to pass it positions
   // as an attribute - so set up that communication
-    shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "position");
-    gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
-
+  //shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "position");
+  //gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
   
+  gl.bindAttribLocation(shaderProgram, 0, "a_position");
+  gl.bindAttribLocation(shaderProgram, 1, "a_normal");
+
+
+
+
+/* TODO: looks like I can stand to lose this.  Let's see if that's true.
+  var vertex_shader   = createShaderFromScript(gl, "vert-shader");
+  var fragment_shader = createShaderFromScript(gl, "frag-shader");
+
+  //The following (through the next comment specifying otherwise) is a snippet from
+  //gl.js - it doesn't allow the customization I need.  See gl.js for attribution information
+  var shaderProgram = gl.createProgram();
+
+  // attach the shaders.
+  gl.attachShader(program, vertexShader);
+  gl.attachShader(program, fragmentShader);
+ 
+  // link the program.
+  gl.linkProgram(program);
+ 
+  // Check if it linked.
+  var success = gl.getProgramParameter(program, gl.LINK_STATUS);
+  if (!success) {
+      // something went wrong with the link
+      throw ("program filed to link:" + gl.getProgramInfoLog (program));
+  }
+
+  if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
+    alert("Could not initialise shaders");
+  }*/
+
+
+  var vertex_position = gl.getAttribLocation(shaderProgram, "a_position");
+  var normal_vector   = gl.getAttribLocation(shaderProgram, "a_normal");
+  if (normal_vector == -1) {
+    console.log("Shit's fucked.");
+  }
+
+  var vertex_buffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer);
+
   // now that we have programs to run on the hardware, we can 
   // make our triangle
 
@@ -132,7 +121,29 @@ function start() {
          0.0,  1.0,  0.0,
         -1.0, -1.0,  0.0,
          1.0, -1.0,  0.0
-   ];  
+  ];  
+
+  gl.bufferData(gl.ARRAY_BUFFER, vertexPos, gl.STATIC_DRAW);
+  gl.enableVertexAttribArray(vertex_position);
+  gl.vertexAttribPointer(vertex_position, 3, gl.FLOAT, gl.FALSE, 0, 0);
+
+  //do the same for normals
+  var normal_buffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, normal_buffer);
+
+  // let's define the normal positions
+  var normalVecs = [
+      0.0, 0.0, 1.0,
+      0.0, 0.0, 1.0,
+      0.0, 0.0, 1.0
+  ];
+
+  gl.bufferData(gl.ARRAY_BUFFER, normalVecs, gl.STATIC_DRAW);
+  gl.enableVertexAttribArray(normal_vector);
+  gl.vertexAttribPointer(normal_vector, 3, gl.FLOAT, gl.FALSE, 0, 0);
+
+
+  
   
   // we need to put the vertices into a buffer so we can
   // block transfer them to the graphics hardware
