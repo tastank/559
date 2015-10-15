@@ -2,6 +2,71 @@
 <head>
 <title>Assignment 6: WebGL</title>
 </head>
+<script type="text/javascript" src="http://graphics.cs.wisc.edu/JS/twgl-full.min.js"></script>
+<script type="x-shader/x-vertex" id="vert-shader">
+//glsl shaders!
+
+////this one's more complicated and I haven't gotten it to work yet
+precision highp float;
+/*attribute vec3 position;
+attribute vec3 normal;
+uniform mat3 normalMatrix;
+uniform mat4 modelViewMatrix;
+uniform mat4 projectionMatrix;
+varying vec3 fNormal;
+
+void main()
+{
+  fNormal = normalize(normalMatrix * normal);
+  vec4 pos = modelViewMatrix * vec4(position, 1.0);
+  gl_Position = projectionMatrix * pos;
+}*/
+
+attribute vec3 a_normal;
+attribute vec3 a_position;
+
+varying vec3 v_pos;
+void main(void) {
+  v_pos = a_position;
+  gl_Position = vec4(a_position, 1.0);
+}
+</script>
+<script type="x-shader/x-fragment" id="frag-shader">
+////this one's more complicated and I haven't gotten it to work yet
+precision highp float;
+/*uniform float time;
+uniform vec2 resolution;
+varying vec3 fPosition;
+varying vec3 fNormal;
+
+vec3 eye_pos = vec3(0.0, 0.0, 1.0);
+vec3 specular_light = vec3(0.0, 1.0, 1.0);
+vec3 specular_color = vec3(1.0, 0., 0.0);
+vec3 halfway = normalize(eye_pos + specular_light);
+float shininess = 0.0;
+
+vec3 diffuse_light = vec3(0.0, 1.0, 1.0);
+vec3 diffuse_color = vec3(1.0, 0.0, 0.0);
+
+void main()
+{
+  float specular_shade = pow(dot(fNormal, halfway), shininess);
+  float diffuse_shade = dot(diffuse_light, fNormal);
+  
+  
+  float ambient_shade = 0.2;
+  vec3 specular_fragcolor = specular_shade*specular_color;
+  vec3 diffuse_fragcolor = (diffuse_shade + ambient_shade)*diffuse_color;
+  float specularness = 0.5;
+  vec3 color = (specular_fragcolor*specularness + diffuse_fragcolor*(1.0-specularness))/(1.0 + ambient_shade);
+  gl_FragColor = vec4(color, 1.0);
+}*/
+varying vec3 v_pos;
+void main(void) {
+  gl_FragColor = vec4(v_pos, 1.0);
+}
+</script>
+<script type="text/javascript" src="gl.js"></script>
 <script type="text/javascript" src="draw.js"></script>
 <body onload="start()">
 <canvas id="main_canvas" width="400" height="400" style="border: 1px solid black;"></canvas><br />
