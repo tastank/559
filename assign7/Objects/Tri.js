@@ -2,8 +2,9 @@
 
 var v3 = twgl.v3;
 
-var Tri = function(p1, p2, p3) {
+var Tri = function(p1, p2, p3, color) {
     this.set(p1, p2, p3);
+    this.color = color;
 }
 
 Tri.prototype.set = function(p1, p2, p3) {
@@ -12,6 +13,10 @@ Tri.prototype.set = function(p1, p2, p3) {
     this.p3 = p3;
     //calculate normal here
     this.normal = v3.cross([p2.getX() - p1.getX(), p2.getY() - p1.getY(), p2.getZ() - p1.getZ()], [p3.getX() - p1.getX(), p3.getY() - p1.getY(), p3.getZ() - p1.getZ()]);
+}
+
+Tri.prototype.setColor = function(color) {
+    this.color = color;
 }
 
 Tri.prototype.getNormal = function() {
@@ -36,4 +41,8 @@ Tri.prototype.getVertexArray = function() {
     this.p2.x, this.p2.y, this.p2.z,
     this.p3.x, this.p3.y, this.p3.z
   ];
+}
+
+Tri.prototype.getColor = function() {
+    return this.color;
 }
