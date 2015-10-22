@@ -39,7 +39,7 @@ var Tree = undefined;
         this.size = size || 1.0;
         this.resolution = resolution;
     }
-    Cube.prototype.init = function(drawingState) {
+    Tree.prototype.init = function(drawingState) {
         var gl=drawingState.gl;
         // create the shaders once - for all cubes
         if (!shaderProgram) {
@@ -47,90 +47,91 @@ var Tree = undefined;
         }
         if (!buffers) {
             var vertices = [];
-            var circle_resolution = resolution;
-            var trunk_radius = 0.5;
-            var trunk_height = 0.3
+            var trunk_radius = 0.2;
+            var trunk_height = 0.2
             var trunk_color = [0.2, 0.2, 0.0];
-            var leaves_radius = 0.8;
-            var leaves_color = [0.0, 1.0, 0.0];
+            var leaves_radius = 0.4;
+            var leaves_color = [0.0, 0.5, 0.0];
             var tree_height = 1.0;
             var tris = [];
-            for (var i = 0; i < circle_resolution; i++) {
-                var theta = 2*Math.PI/circle_resolution*i;
-                var next_theta = 2*Math.PI/circle_resolution*(i+1);
+            for (var i = 0; i < this.resolution; i++) {
+                var theta = 2*Math.PI/this.resolution*i;
+                var next_theta = 2*Math.PI/this.resolution*(i+1);
 
-                var bottom_center = [0,0,0];
-                var bottom_this_it = new Point([
+                var bottom_center = new Point(0,0,0);
+                var bottom_this_it = new Point(
                     Math.cos(theta) * trunk_radius,
-                    Math.sin(theta) * trunk_radius,
-                    0
-                    ]);
+                    0,
+                    Math.sin(theta) * trunk_radius
+                    );
 
-                var bottom_next_it = new Point([
+                var bottom_next_it = new Point(
                     Math.cos(next_theta) * trunk_radius,
-                    Math.sin(next_theta) * trunk_radius,
-                    0
-                    ]);
+                    0,
+                    Math.sin(next_theta) * trunk_radius
+                    );
 
-                var top_trunk_this_it = new Point([
+                var top_trunk_this_it = new Point(
                     Math.cos(theta) * trunk_radius,
-                    Math.sin(theta) * trunk_radius,
-                    trunk_height
-                    ]);
+                    trunk_height,
+                    Math.sin(theta) * trunk_radius
+                    );
 
-                var top_trunk_next_it = new Point ([
+                var top_trunk_next_it = new Point (
                     Math.cos(next_theta) * trunk_radius,
-                    Math.sin(next_theta) * trunk_radius,
-                    trunk_height
-                    ]);
+                    trunk_height,
+                    Math.sin(next_theta) * trunk_radius
+                    );
 
-                var bottom_leaves_this_it = new Point ([
+                var bottom_leaves_this_it = new Point (
                     Math.cos(theta) * leaves_radius,
-                    Math.sin(theta) * leaves_radius,
-                    trunk_height
-                    ]);
+                    trunk_height,
+                    Math.sin(theta) * leaves_radius
+                    );
 
-                var bottom_leaves_next_it = new Point ([
+                var bottom_leaves_next_it = new Point (
                     Math.cos(next_theta) * leaves_radius,
-                    Math.sin(next_theta) * leaves_radius,
-                    trunk_height
-                    ]);
+                    trunk_height,
+                    Math.sin(next_theta) * leaves_radius
+                    );
 
-                var top_of_tree = new Point ([
+                var top_of_tree = new Point (
                     0,
-                    0,
-                    tree_height
-                    ]);
+                    tree_height,
+                    0
+                    );
 
                 //bottom of trunk
                 tris.push(new Tri(bottom_center, bottom_this_it, bottom_next_it, trunk_color));
 
                 //side of trunk - one rectangle, two tris
-                tris.push(new Tri(bottom_this_it, bottom_next_it, top_trunk_this_it, trunk_color));
+                tris.push(new Tri(bottom_next_it, bottom_this_it, top_trunk_this_it, trunk_color));
                 tris.push(new Tri(top_trunk_this_it, top_trunk_next_it, bottom_next_it, trunk_color));
 
                 //bottom of leaves - same story, though it's a trapezoid, not a rectangle
-                tris.push(new Tri(top_trunk_this_it, top_trunk_next_it, bottom_leaves_this_it, leaves_color));
+                tris.push(new Tri(top_trunk_next_it, top_trunk_this_it, bottom_leaves_this_it, leaves_color));
                 tris.push(new Tri(bottom_leaves_this_it, bottom_leaves_next_it, top_trunk_next_it, leaves_color));
 
                 //side of tree - only one tri per iteration!
-                tris.push(new Tri(bottom_leaves_this_it, bottom_leaves_next_it, top_of_tree, leaves_color));
+                tris.push(new Tri(bottom_leaves_next_it, bottom_leaves_this_it, top_of_tree, leaves_color));
             }
 
             var vertices = [];
             for (var i = 0; i < tris.length; i++) {
-                vertices.append(tris[i].getVertexArray());
+                vertices = vertices.concat(tris[i].getVertexArray());
             }
 
-            //For every iteration, there should be 6 triangles
-            //and there are ${circle_resolution} iterations
             var normals = [];
             var colors = [];
 
             //do for each vertex, not just each tri
-            for (var i = 0; i < tris.length * 3; i++) {
-                normals.append(tris[i].getNormal());
-                colors.append(tris[i].getColor());
+            for (var i = 0; i < tris.length ; i++) {
+                normals = normals.concat(tris[i].getNormal());
+                normals = normals.concat(tris[i].getNormal());
+                normals = normals.concat(tris[i].getNormal());
+                colors = colors.concat(tris[i].getColor());
+                colors = colors.concat(tris[i].getColor());
+                colors = colors.concat(tris[i].getColor());
             }
 
 
@@ -156,40 +157,7 @@ var Tree = undefined;
             model: modelM });
         twgl.drawBufferInfo(gl, gl.TRIANGLES, buffers);
     };
-    Cube.prototype.center = function(drawingState) {
-        return this.position;
-    }
-
-
-    ////////
-    // constructor for Cubes
-    SpinningCube = function SpinningCube(name, position, size, color, axis) {
-        Cube.apply(this,arguments);
-        this.axis = axis || 'X';
-    }
-    SpinningCube.prototype = Object.create(Cube.prototype);
-    SpinningCube.prototype.draw = function(drawingState) {
-        // we make a model matrix to place the cube in the world
-        var modelM = twgl.m4.scaling([this.size,this.size,this.size]);
-        var theta = Number(drawingState.realtime)/200.0;
-        if (this.axis == 'X') {
-            twgl.m4.rotateX(modelM, theta, modelM);
-        } else if (this.axis == 'Z') {
-            twgl.m4.rotateZ(modelM, theta, modelM);
-        } else {
-            twgl.m4.rotateY(modelM, theta, modelM);
-        }
-        twgl.m4.setTranslation(modelM,this.position,modelM);
-        // the drawing coce is straightforward - since twgl deals with the GL stuff for us
-        var gl = drawingState.gl;
-        gl.useProgram(shaderProgram.program);
-        twgl.setBuffersAndAttributes(gl,shaderProgram,buffers);
-        twgl.setUniforms(shaderProgram,{
-            view:drawingState.view, proj:drawingState.proj, lightdir:drawingState.sunDirection,
-            cubecolor:this.color, model: modelM });
-        twgl.drawBufferInfo(gl, gl.TRIANGLES, buffers);
-    };
-    SpinningCube.prototype.center = function(drawingState) {
+    Tree.prototype.center = function(drawingState) {
         return this.position;
     }
 
@@ -200,12 +168,14 @@ var Tree = undefined;
 // normally, this would happen in a "scene description" file
 // but I am putting it here, so that if you want to get
 // rid of cubes, just don't load this file.
-grobjects.push(new Cube("cube1",[-2,0.5,   0],1) );
-grobjects.push(new Cube("cube2",[ 2,0.5,   0],1, [1,1,0]));
-grobjects.push(new Cube("cube3",[ 0, 0.5, -2],1 , [0,1,1]));
-grobjects.push(new Cube("cube4",[ 0,0.5,   2],1));
+for (var i = -4; i <= 4; i++) {
+    for (var j = -4; j <= 4; j++ ){
+        if (Math.abs(i) < 2 || Math.abs(j) < 2) {
+            grobjects.push(new Tree("tree"+i+"-"+j,[i, 0, j],1, 500) );
+        }
+    }
+}
 
-grobjects.push(new SpinningCube("scube 1",[-2,0.5, -2],1) );
-grobjects.push(new SpinningCube("scube 2",[-2,0.5,  2],1,  [1,0,0], 'Y'));
-grobjects.push(new SpinningCube("scube 3",[ 2,0.5, -2],1 , [0,0,1], 'Z'));
-grobjects.push(new SpinningCube("scube 4",[ 2,0.5,  2],1));
+
+
+
