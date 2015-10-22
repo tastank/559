@@ -38,6 +38,8 @@ var groundPlaneSize = groundPlaneSize || 5;
         -groundPlaneSize, 0,  groundPlaneSize
     ];
 
+    var ground_color = [0.2, 0.2, 0.0];
+
     // since there will be one of these, just keep info in the closure
     var shaderProgram = undefined;
     var buffers = undefined;
@@ -61,19 +63,37 @@ var groundPlaneSize = groundPlaneSize || 5;
             // an abbreviation...
             var gl = drawingState.gl;
             if (!shaderProgram) {
-                shaderProgram = twgl.createProgramInfo(gl,["ground-vs","ground-fs"]);
+                shaderProgram = twgl.createProgramInfo(gl,["world-vs","world-fs"]);
             }
-            var arrays = { vpos : {numComponents:3, data:vertexPos }};
+            var arrays = { 
+                a_pos : {numComponents:3, data:vertexPos },
+                a_normal: {numComponents:3, data:
+                    [0,1,0, 0,1,0, 0,1,0,
+                     0,1,0, 0,1,0, 0,1,0]
+                },
+                a_color: {numComponents:3, data:
+                    [ground_color, ground_color, ground_color,
+                     ground_color, ground_color, ground_color]
+                },
+            };
             buffers = twgl.createBufferInfoFromArrays(gl,arrays);
-       },
+        };
         draw : function(drawingState) {
+            var modelM = twgl.m4.identity();
             var gl = drawingState.gl;
             gl.useProgram(shaderProgram.program);
             twgl.setBuffersAndAttributes(gl,shaderProgram,buffers);
             twgl.setUniforms(shaderProgram,{
-                view:drawingState.view, proj:drawingState.proj
-            });
-            twgl.drawBufferInfo(gl, gl.TRIANGLES, buffers);
+                u_specularness: 0.0,
+                u_shininess:    0.0,
+                u_view:drawingState.view,
+                u_proj:drawingState.proj,
+                u_lightdir:drawingState.sunDirection,
+                u_suncolor:drawingState.sunColor,
+                u_model: modelM });
+
+        });
+        twgl.drawBufferInfo(gl, gl.TRIANGLES, buffers);
         },
         center : function(drawingState) {
             return [0,0,0];

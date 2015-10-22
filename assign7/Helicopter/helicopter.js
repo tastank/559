@@ -36,6 +36,14 @@ an example of a more complex/richer behavior.
     var copterBodyBuffers = undefined;
     var copterRotorBuffers = undefined;
     var copterNumber = 0;
+    var fuse_specularness = 0.5;
+    var fuse_shininess = 20.0;
+    var rotor_angle = 0;
+    var rotor_speed = 0.2;
+    var rotor_specularness = 0.5;
+    var rotor_shininess = 10.0;
+    var pad_specularness = 0.0;
+    var pad_shininess = 0.0;
 
     var padBuffers = undefined;
     var padNumber = 0;
@@ -54,30 +62,32 @@ an example of a more complex/richer behavior.
 
         // create the shaders once - for all cubes
         if (!shaderProgram) {
-            shaderProgram = twgl.createProgramInfo(gl, ["copter-vs", "copter-fs"]);
+            shaderProgram = twgl.createProgramInfo(gl, ["world-vs", "world-fs"]);
         }
         if (!copterBodyBuffers) {
             var arrays = {
-                vpos : { numComponents: 3, data: [
+                a_pos : { numComponents: 3, data: [
                     .5, 0, 0,  0,0,.5,  -.5,0,0,  0,0, -.5, 0,.5,0,    0, -.5,0,
                     q,0,-q,  0,q,-q,  -q,0,-q,  0,-q,-q,  0,0,-1
                 ] },
-                vnormal : {numComponents:3, data: [
+                a_normal : {numComponents:3, data: [
                     1,0,0,  0,0,1,  -1,0,0,  0,0,-1, 0,1,0,  0,-1,0,
                     1,0,0,  0,1,0,  -1,0,0,  0,-1,0,  0,0,-1
                 ]},
                 indices : [0,1,4, 1,2,4, 2,3,4, 3,0,4, 1,0,5, 2,1,5, 3,2,5, 0,3,5,
                            6,7,10, 7,8,10, 8,9,10, 9,6,10
                             ],
-                color : [1,0,0, 1,0,0, 1,0,0, 1,0,0, 1,0,0, 1,0,0, 1,0,0, 1,0,0, 1,0,0, 1,0,0, 1,0,0, 1, 0, 0] 
+                a_color : {numComponents:3, data: 
+                    [1,0,0, 1,0,0, 1,0,0, 1,0,0, 1,0,0, 1,0,0, 1,0,0, 1,0,0, 1,0,0, 1,0,0, 1,0,0, 1, 0, 0] 
+                }
             };
             copterBodyBuffers = twgl.createBufferInfoFromArrays(drawingState.gl,arrays);
 
             var rarrays = {
-                vpos : {numcomponents:3, data: [0,.5,0, 1,.5,.1, 1,.5, -.1,
+                a_pos : {numComponents:3, data: [0,.5,0, 1,.5,.1, 1,.5, -.1,
                                                 0,.5,0, -1,.5,.1, -1,.5, -.1]},
-                vnormal : {numcomponents:3, data: [0,1,0, 0,1,0, 0,1,0, 0,1,0, 0,1,0, 0,1,0]},
-                vcolor: {numcomponents:3, data: [0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0]},
+                a_normal : {numComponents:3, data: [0,1,0, 0,1,0, 0,1,0, 0,1,0, 0,1,0, 0,1,0]},
+                a_color: {numComponents:3, data: [0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0]},
                 indices : [0,1,2, 3,4,5]
             };
             copterRotorBuffers = twgl.createBufferInfoFromArrays(drawingState.gl,rarrays);
@@ -103,10 +113,25 @@ an example of a more complex/richer behavior.
         var gl = drawingState.gl;
         gl.useProgram(shaderProgram.program);
         twgl.setUniforms(shaderProgram,{
-            view:drawingState.view, proj:drawingState.proj, lightdir:drawingState.sunDirection,
-            model: modelM });
+            u_specularness: fuse_specularness,
+            u_shininess:    fuse_shininess,
+            u_view:drawingState.view,
+            u_proj:drawingState.proj,
+            u_lightdir:drawingState.sunDirection,
+            u_suncolor: drawingState.sunColor,
+            u_model: modelM });
         twgl.setBuffersAndAttributes(gl,shaderProgram,copterBodyBuffers);
         twgl.drawBufferInfo(gl, gl.TRIANGLES, copterBodyBuffers);
+        rotor_angle -= rotor_speed;
+        modelM = twgl.m4.rotateY(modelM, rotor_angle);
+        twgl.setUniforms(shaderProgram,{
+            u_specularness: rotor_specularness,
+            u_shininess:    rotor_shininess,
+            u_view:drawingState.view,
+            u_proj:drawingState.proj,
+            u_lightdir:drawingState.sunDirection,
+            u_suncolor: drawingState.sunColor,
+            u_model: modelM });
         twgl.setBuffersAndAttributes(gl,shaderProgram,copterRotorBuffers);
         twgl.drawBufferInfo(gl, gl.TRIANGLES, copterRotorBuffers);
     };
@@ -133,23 +158,29 @@ an example of a more complex/richer behavior.
 
         // create the shaders once - for all cubes
         if (!shaderProgram) {
-            shaderProgram = twgl.createProgramInfo(gl, ["cube-vs", "cube-fs"]);
+            shaderProgram = twgl.createProgramInfo(gl, ["world-vs", "world-fs"]);
         }
         if (!padBuffers) {
             var arrays = {
-                vpos : { numComponents: 3, data: [
+                a_pos : { numComponents: 3, data: [
                     -1,0,-1, -1,0,1, -.5,0,1, -.5,0,-1,
                     1,0,-1, 1,0,1, .5,0,1, .5,0,-1,
                     -.5,0,-.25, -.5,0,.25,.5,0,.25,.5,0, -.25
 
                 ] },
-                vnormal : {numComponents:3, data: [
+                a_normal : {numComponents:3, data: [
                     0,1,0, 0,1,0, 0,1,0, 0,1,0,
                     0,1,0, 0,1,0, 0,1,0, 0,1,0,
                     0,1,0, 0,1,0, 0,1,0, 0,1,0
                 ]},
                 indices : [0,1,2, 0,2,3, 4,5,6, 4,6,7, 8,9,10, 8,10,11
-                            ]
+                            ],
+                a_color : {numComponents: 3, data: [
+                    1,1,1, 1,1,1, 1,1,1, 1,1,1,
+                    1,1,1, 1,1,1, 1,1,1, 1,1,1,
+                    1,1,1, 1,1,1, 1,1,1, 1,1,1
+                    ]
+                }
             };
             padBuffers = twgl.createBufferInfoFromArrays(drawingState.gl,arrays);
         }
@@ -163,8 +194,13 @@ an example of a more complex/richer behavior.
         var gl = drawingState.gl;
         gl.useProgram(shaderProgram.program);
         twgl.setUniforms(shaderProgram,{
-            view:drawingState.view, proj:drawingState.proj, lightdir:drawingState.sunDirection,
-            cubecolor:[1,1,0], model: modelM });
+            u_specularness: pad_specularness,
+            u_shininess:    pad_shininess,
+            u_view:drawingState.view,
+            u_proj:drawingState.proj,
+            u_lightdir:drawingState.sunDirection,
+            u_suncolor: drawingState.sunColor,
+            u_model: modelM });
         twgl.setBuffersAndAttributes(gl,shaderProgram,padBuffers);
         twgl.drawBufferInfo(gl, gl.TRIANGLES, padBuffers);
     };

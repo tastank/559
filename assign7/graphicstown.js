@@ -203,6 +203,32 @@ window.onload = function() {
         var tod = Number(sliders.TimeOfDay.value);
         var sunAngle = Math.PI * (tod-6)/12;
         var sunDirection = [Math.cos(sunAngle),Math.sin(sunAngle),0];
+        //todo: this should make things turn yellow/orange as the sun goes down
+        //don't worry about normalizing - that's done in the shader!
+        var sunRed   = 1;
+        var sunGreen = 1;
+        var sunBlue  = 1;
+        if (tod < 9 || tod > 15) {
+            //we can't let color be (0,0,0) or the shader won't be able to
+            //normalize it.
+            var loss_factor = 0.8;
+            //abs > 4 now
+            var abs = Math.abs(tod - 12);
+            var blue_loss  = Math.min((abs-3)/2.0, 1);
+            //red and green should reach 0 at the same time so it never looks pink -
+            //thus the value subtracted from abs plus the divisor must be equal for
+            //the red and green loss formulas
+            var green_loss = Math.min((abs-4)/4.0, 1);
+            var red_loss   = Math.min((abs-6)/2.0, 1);
+
+            sunRed   -= (red_loss   * loss_factor);
+            sunGreen -= (green_loss * loss_factor);
+            sunBlue  -= (blue_loss  * loss_factor);
+        }
+        //todo: this is hacky and required because of the shader.  This shouldn't
+        // have to know anything about the shader.
+        var sunColor = [sunRed, sunGreen, sunBlue];
+
 
         // make a real drawing state for drawing
         var drawingState = {
@@ -211,6 +237,7 @@ window.onload = function() {
             view : viewM,   // twgl.m4.identity(),
             timeOfDay : tod,
             sunDirection : sunDirection,
+            sunColor: sunColor,
             realtime : realtime
         }
 

@@ -43,7 +43,7 @@ var Tree = undefined;
         var gl=drawingState.gl;
         // create the shaders once - for all cubes
         if (!shaderProgram) {
-            shaderProgram = twgl.createProgramInfo(gl, ["tree-vs", "tree-fs"]);
+            shaderProgram = twgl.createProgramInfo(gl, ["world-vs", "world-fs"]);
         }
         if (!buffers) {
             var vertices = [];
@@ -136,9 +136,9 @@ var Tree = undefined;
 
 
             var arrays = {
-                vpos : { numComponents: 3, data: vertices },
-                vnormal : { numComponents:3, data: normals },
-                vcolor : {numComponents:3, data: colors }
+                a_pos : { numComponents: 3, data: vertices },
+                a_normal : { numComponents:3, data: normals },
+                a_color : {numComponents:3, data: colors }
             };
             buffers = twgl.createBufferInfoFromArrays(drawingState.gl,arrays);
         }
@@ -153,8 +153,14 @@ var Tree = undefined;
         gl.useProgram(shaderProgram.program);
         twgl.setBuffersAndAttributes(gl,shaderProgram,buffers);
         twgl.setUniforms(shaderProgram,{
-            view:drawingState.view, proj:drawingState.proj, lightdir:drawingState.sunDirection,
-            model: modelM });
+            //it's a tree
+            u_specularness: 0.0,
+            u_shininess:    0.0,
+            u_view:drawingState.view,
+            u_proj:drawingState.proj,
+            u_lightdir:drawingState.sunDirection,
+            u_suncolor:drawingState.sunColor,
+            u_model: modelM });
         twgl.drawBufferInfo(gl, gl.TRIANGLES, buffers);
     };
     Tree.prototype.center = function(drawingState) {
@@ -171,7 +177,7 @@ var Tree = undefined;
 for (var i = -4; i <= 4; i++) {
     for (var j = -4; j <= 4; j++ ){
         if (Math.abs(i) < 2 || Math.abs(j) < 2) {
-            grobjects.push(new Tree("tree"+i+"-"+j,[i, 0, j],1, 500) );
+            grobjects.push(new Tree("tree"+i+"-"+j,[i, 0, j],1, 200) );
         }
     }
 }
