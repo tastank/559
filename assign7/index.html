@@ -14,12 +14,12 @@
 <script src="Libraries/arcball.js"></script>
 <script src="grobject.js"></script>
 <script src="ExampleObjects/ground.js"></script>
+<script src="Objects/Point.js"></script>
+<script src="Objects/Tri.js"></script>
 
 <!-- This is where we load the objects for the world -->
 <script src="ExampleObjects/simplest.js"></script>
 <script src="ExampleObjects/texturedplane.js"></script>
-<script src="Objects/Point.js"></script>
-<script src="Objects/Tri.js"></script>
 <script src="Objects/Tree.js"></script>
 <script src="ExampleObjects/cube.js"></script>
 
@@ -73,6 +73,150 @@
         gl_FragColor = vec4(outColor, 1.0);
     }
 </script>
+
+
+
+
+<!--Tree shaders!! -->
+<script id="tree-vs" type="notjs">
+precision highp float;
+attribute vec3 vpos;
+attribute vec3 vnormal;
+attribute vec3 vcolor;
+
+//uniform mat4 u_normal_matrix;
+uniform mat4 view;
+uniform mat4 model;
+uniform mat4 proj;
+uniform vec3 lightdir;
+
+varying vec3 v_pos;
+varying vec3 v_norm;
+varying vec3 v_color;
+
+mat3 normal_matrix;
+
+void main()
+{
+  normal_matrix[0] = model[0].xyz;
+  normal_matrix[1] = model[1].xyz;
+  normal_matrix[2] = model[2].xyz;
+
+  v_norm = normalize(normal_matrix * vnormal);
+  vec4 pos = model * vec4(vpos, 1.0);
+  vec3 v_pos = pos.xyz;
+  pos = proj * view * pos;
+  v_color = vcolor;
+  gl_Position = proj * view * model * vec4(vpos, 1.0);
+}
+</script>
+<script id="tree-fs" type="notjs">
+precision highp float;
+
+varying vec3 v_pos;
+varying vec3 v_norm;
+varying vec3 v_color;
+
+uniform vec3 lightdir;
+
+vec3 eye_pos = vec3(0.0, 0.0, 1.0);
+//the above should be passed as a parameter to the shader and could be easily enough, but I need sleep more than to comb through the drawing code again
+vec3 specular_light = vec3(0.0, 1.0, 1.0);
+vec3 specular_color = v_color;
+vec3 halfway = normalize(eye_pos + specular_light);
+float shininess = 20.0;
+
+vec3 diffuse_light = lightdir;
+vec3 diffuse_color = v_color;
+
+void main()
+{
+  float specular_shade = max(0.0, pow(dot(v_norm, halfway), shininess));
+  float diffuse_shade = max(0.0, dot(diffuse_light, v_norm));
+  
+  
+  float ambient_shade = 0.5;
+  vec3 specular_fragcolor = specular_shade*specular_color;
+  vec3 diffuse_fragcolor = (diffuse_shade + ambient_shade)*diffuse_color;
+  float specularness = 0.0;
+  vec3 color = (specular_fragcolor*specularness + diffuse_fragcolor*(1.0-specularness))/(1.0 + ambient_shade);
+  gl_FragColor = vec4(color, 1.0);
+}
+</script>
+
+
+
+<script id="copter-vs" type="notjs">
+precision highp float;
+attribute vec3 vpos;
+attribute vec3 vnormal;
+attribute vec3 vcolor;
+
+//uniform mat4 u_normal_matrix;
+uniform mat4 view;
+uniform mat4 model;
+uniform mat4 proj;
+uniform vec3 lightdir;
+
+varying vec3 v_pos;
+varying vec3 v_norm;
+varying vec3 v_color;
+
+mat3 normal_matrix;
+
+void main()
+{
+  normal_matrix[0] = model[0].xyz;
+  normal_matrix[1] = model[1].xyz;
+  normal_matrix[2] = model[2].xyz;
+
+  v_norm = normalize(normal_matrix * vnormal);
+  vec4 pos = model * vec4(vpos, 1.0);
+  vec3 v_pos = pos.xyz;
+  pos = proj * view * pos;
+  v_color = vcolor;
+  gl_Position = proj * view * model * vec4(vpos, 1.0);
+}
+</script>
+<script id="copter-fs" type="notjs">
+precision highp float;
+
+varying vec3 v_pos;
+varying vec3 v_norm;
+varying vec3 v_color;
+
+uniform vec3 lightdir;
+
+vec3 eye_pos = vec3(0.0, 0.0, 1.0);
+//the above should be passed as a parameter to the shader and could be easily enough, but I need sleep more than to comb through the drawing code again
+vec3 specular_light = vec3(0.0, 1.0, 1.0);
+vec3 specular_color = v_color;
+vec3 halfway = normalize(eye_pos + specular_light);
+float shininess = 20.0;
+
+vec3 diffuse_light = lightdir;
+vec3 diffuse_color = v_color;
+
+void main()
+{
+  float specular_shade = max(0.0, pow(dot(v_norm, halfway), shininess));
+  float diffuse_shade = max(0.0, dot(diffuse_light, v_norm));
+  
+  
+  float ambient_shade = 0.5;
+  vec3 specular_fragcolor = specular_shade*specular_color;
+  vec3 diffuse_fragcolor = (diffuse_shade + ambient_shade)*diffuse_color;
+  float specularness = 0.5;
+  vec3 color = (specular_fragcolor*specularness + diffuse_fragcolor*(1.0-specularness))/(1.0 + ambient_shade);
+  gl_FragColor = vec4(color, 1.0);
+}
+</script>
+
+
+
+
+
+
 
 <!-- Special Ground Plane Shader - makes a boring
      checkerboard
