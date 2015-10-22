@@ -54,7 +54,7 @@ an example of a more complex/richer behavior.
 
         // create the shaders once - for all cubes
         if (!shaderProgram) {
-            shaderProgram = twgl.createProgramInfo(gl, ["cube-vs", "cube-fs"]);
+            shaderProgram = twgl.createProgramInfo(gl, ["copter-vs", "copter-fs"]);
         }
         if (!copterBodyBuffers) {
             var arrays = {
@@ -68,7 +68,8 @@ an example of a more complex/richer behavior.
                 ]},
                 indices : [0,1,4, 1,2,4, 2,3,4, 3,0,4, 1,0,5, 2,1,5, 3,2,5, 0,3,5,
                            6,7,10, 7,8,10, 8,9,10, 9,6,10
-                            ]
+                            ],
+                color : [1,0,0, 1,0,0, 1,0,0, 1,0,0, 1,0,0, 1,0,0, 1,0,0, 1,0,0, 1,0,0, 1,0,0, 1,0,0, 1, 0, 0] 
             };
             copterBodyBuffers = twgl.createBufferInfoFromArrays(drawingState.gl,arrays);
 
@@ -76,6 +77,7 @@ an example of a more complex/richer behavior.
                 vpos : {numcomponents:3, data: [0,.5,0, 1,.5,.1, 1,.5, -.1,
                                                 0,.5,0, -1,.5,.1, -1,.5, -.1]},
                 vnormal : {numcomponents:3, data: [0,1,0, 0,1,0, 0,1,0, 0,1,0, 0,1,0, 0,1,0]},
+                vcolor: {numcomponents:3, data: [0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0]},
                 indices : [0,1,2, 3,4,5]
             };
             copterRotorBuffers = twgl.createBufferInfoFromArrays(drawingState.gl,rarrays);
@@ -102,7 +104,7 @@ an example of a more complex/richer behavior.
         gl.useProgram(shaderProgram.program);
         twgl.setUniforms(shaderProgram,{
             view:drawingState.view, proj:drawingState.proj, lightdir:drawingState.sunDirection,
-            cubecolor:this.color, model: modelM });
+            model: modelM });
         twgl.setBuffersAndAttributes(gl,shaderProgram,copterBodyBuffers);
         twgl.drawBufferInfo(gl, gl.TRIANGLES, copterBodyBuffers);
         twgl.setBuffersAndAttributes(gl,shaderProgram,copterRotorBuffers);
