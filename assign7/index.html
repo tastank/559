@@ -21,6 +21,7 @@
 <script src="ExampleObjects/simplest.js"></script>
 <script src="ExampleObjects/texturedplane.js"></script>
 <script src="Objects/Tree.js"></script>
+<script src="Objects/Sun.js"></script>
 <script src="ExampleObjects/cube.js"></script>
 
 <!-- I am adding the helicopter -->
@@ -281,6 +282,8 @@ uniform vec3 u_lightdir;
 uniform float u_specularness;
 uniform vec3 u_suncolor;
 uniform float u_shininess;
+uniform float u_emittance;
+uniform vec3 u_emittance_color;
 
 //todo: fix this - should be a uniform from program
 vec3 eye_pos = vec3(0.0, 1.0, 1.0);
@@ -307,7 +310,8 @@ void main()
   vec3 diffuse_fragcolor = (diffuse_shade + ambient_shade)*diffuse_color*suncolor + suncolor * 0.1;
 
   float specularness = u_specularness;
-  vec3 color = (specular_fragcolor*specularness + diffuse_fragcolor*(1.0-specularness))/(1.0 + ambient_shade);
+  vec3 color = (specular_fragcolor*specularness + diffuse_fragcolor*(1.0-specularness))/(1.0 + ambient_shade)*(1.0 - u_emittance);
+  color += u_emittance * u_emittance_color;
   gl_FragColor = vec4(color, 1.0);
 }
 </script>

@@ -156,6 +156,8 @@ var Tree = undefined;
             //it's a tree
             u_specularness: 0.0,
             u_shininess:    0.0,
+            u_emittance:    0.0,
+            u_emittance_color:  drawingState.sunColor,
             u_view:drawingState.view,
             u_proj:drawingState.proj,
             u_lightdir:drawingState.sunDirection,

@@ -115,6 +115,7 @@ an example of a more complex/richer behavior.
         twgl.setUniforms(shaderProgram,{
             u_specularness: fuse_specularness,
             u_shininess:    fuse_shininess,
+            u_emittance:    0.0,
             u_view:drawingState.view,
             u_proj:drawingState.proj,
             u_lightdir:drawingState.sunDirection,
@@ -127,6 +128,7 @@ an example of a more complex/richer behavior.
         twgl.setUniforms(shaderProgram,{
             u_specularness: rotor_specularness,
             u_shininess:    rotor_shininess,
+            u_emittance:    0.0,
             u_view:drawingState.view,
             u_proj:drawingState.proj,
             u_lightdir:drawingState.sunDirection,
@@ -196,6 +198,8 @@ an example of a more complex/richer behavior.
         twgl.setUniforms(shaderProgram,{
             u_specularness: pad_specularness,
             u_shininess:    pad_shininess,
+            u_emittance:    0.0,
+            u_emittance_color:  drawingState.sunColor,
             u_view:drawingState.view,
             u_proj:drawingState.proj,
             u_lightdir:drawingState.sunDirection,

@@ -38,7 +38,11 @@ var groundPlaneSize = groundPlaneSize || 5;
         -groundPlaneSize, 0,  groundPlaneSize
     ];
 
-    var ground_color = [0.2, 0.2, 0.0];
+    var ground_color = [0.1, 0.1, 0.0];
+    var color = [];
+    for (var i = 0; i < 6; i++) {
+        color = color.concat(ground_color);
+    }
 
     // since there will be one of these, just keep info in the closure
     var shaderProgram = undefined;
@@ -71,13 +75,10 @@ var groundPlaneSize = groundPlaneSize || 5;
                     [0,1,0, 0,1,0, 0,1,0,
                      0,1,0, 0,1,0, 0,1,0]
                 },
-                a_color: {numComponents:3, data:
-                    [ground_color, ground_color, ground_color,
-                     ground_color, ground_color, ground_color]
-                },
+                a_color: {numComponents:3, data: color},
             };
             buffers = twgl.createBufferInfoFromArrays(gl,arrays);
-        };
+        },
         draw : function(drawingState) {
             var modelM = twgl.m4.identity();
             var gl = drawingState.gl;
@@ -86,15 +87,18 @@ var groundPlaneSize = groundPlaneSize || 5;
             twgl.setUniforms(shaderProgram,{
                 u_specularness: 0.0,
                 u_shininess:    0.0,
+                u_emittance:    0.0,
+                u_emittance_color:  drawingState.sunColor,
                 u_view:drawingState.view,
                 u_proj:drawingState.proj,
                 u_lightdir:drawingState.sunDirection,
                 u_suncolor:drawingState.sunColor,
-                u_model: modelM });
+                u_model: modelM 
+            });
 
-        });
-        twgl.drawBufferInfo(gl, gl.TRIANGLES, buffers);
+            twgl.drawBufferInfo(gl, gl.TRIANGLES, buffers);
         },
+
         center : function(drawingState) {
             return [0,0,0];
         }
