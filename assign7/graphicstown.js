@@ -229,8 +229,6 @@ window.onload = function() {
             sunBlue  -= (blue_loss  * loss_factor);
             sunlight = Math.max(0.0, Math.min(1.0, (8 - abs) / 3.0));
         }
-        //todo: this is hacky and required because of the shader.  This shouldn't
-        // have to know anything about the shader.
         var sunColor = [sunRed, sunGreen, sunBlue];
 
 
