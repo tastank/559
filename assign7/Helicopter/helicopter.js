@@ -35,11 +35,12 @@ an example of a more complex/richer behavior.
     var shaderProgram = undefined;
     var copterBodyBuffers = undefined;
     var copterRotorBuffers = undefined;
+    var copterTailRotorBuffers = undefined;
     var copterNumber = 0;
     var fuse_specularness = 0.5;
     var fuse_shininess = 20.0;
     var rotor_angle = 0;
-    var rotor_speed = 0.2;
+    var rotor_speed = 0.3;
     var rotor_specularness = 0.5;
     var rotor_shininess = 10.0;
     var pad_specularness = 0.0;
@@ -91,6 +92,15 @@ an example of a more complex/richer behavior.
                 indices : [0,1,2, 3,4,5]
             };
             copterRotorBuffers = twgl.createBufferInfoFromArrays(drawingState.gl,rarrays);
+
+            var trarrays = {
+                a_pos : {numComponents:3, data: [-.1,0,0,   -.1, .3,-.05,  -.1, .3, .05,
+                                                 -.1,0,0,   -.1,-.3, .05,  -.1,-.3, -.05]},
+                a_normal : {numComponents:3, data: [1,0,0, 1,0,0, 1,0,0, 1,0,0, 1,0,0, 1,0,0]},
+                a_color: {numComponents:3, data: [0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0]},
+                indices : [0,1,2, 3,4,5]
+            };
+            copterTailRotorBuffers = twgl.createBufferInfoFromArrays(drawingState.gl,trarrays);
         }
         // put the helicopter on a random helipad
         // see the stuff on helicopter behavior to understand the thing
@@ -120,10 +130,14 @@ an example of a more complex/richer behavior.
             u_proj:drawingState.proj,
             u_lightdir:drawingState.sunDirection,
             u_suncolor: drawingState.sunColor,
+            u_sunlight: drawingState.sunlight,
             u_model: modelM });
         twgl.setBuffersAndAttributes(gl,shaderProgram,copterBodyBuffers);
         twgl.drawBufferInfo(gl, gl.TRIANGLES, copterBodyBuffers);
+
+
         rotor_angle -= rotor_speed;
+        var tailrotor_angle = 4 * rotor_angle;
         modelM = twgl.m4.rotateY(modelM, rotor_angle);
         twgl.setUniforms(shaderProgram,{
             u_specularness: rotor_specularness,
@@ -133,9 +147,28 @@ an example of a more complex/richer behavior.
             u_proj:drawingState.proj,
             u_lightdir:drawingState.sunDirection,
             u_suncolor: drawingState.sunColor,
+            u_sunlight: drawingState.sunlight,
             u_model: modelM });
         twgl.setBuffersAndAttributes(gl,shaderProgram,copterRotorBuffers);
         twgl.drawBufferInfo(gl, gl.TRIANGLES, copterRotorBuffers);
+
+        modelM = twgl.m4.rotationY(this.orientation);
+        twgl.m4.setTranslation(modelM,this.position,modelM);
+        twgl.m4.translate(modelM,new Float32Array([0,0,-1]), modelM);
+        twgl.m4.rotateX(modelM, tailrotor_angle, modelM);
+
+        twgl.setUniforms(shaderProgram,{
+            u_specularness: rotor_specularness,
+            u_shininess:    rotor_shininess,
+            u_emittance:    0.0,
+            u_view:drawingState.view,
+            u_proj:drawingState.proj,
+            u_lightdir:drawingState.sunDirection,
+            u_suncolor: drawingState.sunColor,
+            u_sunlight: drawingState.sunlight,
+            u_model: modelM });
+        twgl.setBuffersAndAttributes(gl,shaderProgram,copterTailRotorBuffers);
+        twgl.drawBufferInfo(gl, gl.TRIANGLES, copterTailRotorBuffers);
     };
     Copter.prototype.center = function(drawingState) {
         return this.position;

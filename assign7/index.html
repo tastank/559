@@ -284,6 +284,7 @@ uniform vec3 u_suncolor;
 uniform float u_shininess;
 uniform float u_emittance;
 uniform vec3 u_emittance_color;
+uniform float u_sunlight;
 
 //todo: fix this - should be a uniform from program
 vec3 eye_pos = vec3(0.0, 1.0, 1.0);
@@ -301,12 +302,12 @@ vec3 diffuse_color = v_color;
 void main()
 {
   float specular_shade = max(0.0, pow(dot(v_norm, halfway), u_shininess));
-  float diffuse_shade = max(0.0, dot(diffuse_light, v_norm));
+  float diffuse_shade = max(0.0, dot(diffuse_light, v_norm) * u_sunlight);
   
   vec3 suncolor = normalize(u_suncolor) * 3.0;
   
   float ambient_shade = 0.2;
-  vec3 specular_fragcolor = specular_shade*specular_color;
+  vec3 specular_fragcolor = specular_shade*specular_color*u_sunlight;
   vec3 diffuse_fragcolor = (diffuse_shade + ambient_shade)*diffuse_color*suncolor + suncolor * 0.1;
 
   float specularness = u_specularness;

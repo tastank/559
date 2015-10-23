@@ -93,6 +93,7 @@ var groundPlaneSize = groundPlaneSize || 5;
                 u_proj:drawingState.proj,
                 u_lightdir:drawingState.sunDirection,
                 u_suncolor:drawingState.sunColor,
+                u_sunlight: drawingState.sunlight,
                 u_model: modelM 
             });
 

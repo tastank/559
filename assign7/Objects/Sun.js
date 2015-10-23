@@ -142,6 +142,7 @@ var Sun = undefined;
             u_proj:drawingState.proj,
             u_lightdir:drawingState.sunDirection,
             u_suncolor:drawingState.sunColor,
+            u_sunlight: drawingState.sunlight,
             u_model: modelM });
         twgl.drawBufferInfo(gl, gl.TRIANGLES, buffers);
     };
