@@ -210,10 +210,11 @@ window.onload = function() {
         var sunRed   = 1;
         var sunGreen = 1;
         var sunBlue  = 1;
+        var sunlight = 1;
         if (tod < 9 || tod > 15) {
             //we can't let color be (0,0,0) or the shader won't be able to
             //normalize it.
-            var loss_factor = 0.8;
+            var loss_factor = 0.99;
             //abs > 4 now
             var abs = Math.abs(tod - 12);
             var blue_loss  = Math.min((abs-3)/2.0, 1);
@@ -226,6 +227,7 @@ window.onload = function() {
             sunRed   -= (red_loss   * loss_factor);
             sunGreen -= (green_loss * loss_factor);
             sunBlue  -= (blue_loss  * loss_factor);
+            sunlight = Math.max(0.0, Math.min(1.0, (8 - abs) / 3.0));
         }
         //todo: this is hacky and required because of the shader.  This shouldn't
         // have to know anything about the shader.
@@ -241,6 +243,7 @@ window.onload = function() {
             sunDirection : sunDirection,
             sunColor: sunColor,
             sunAngle: sunAngle,
+            sunlight: sunlight,
             realtime : realtime
         }
 
