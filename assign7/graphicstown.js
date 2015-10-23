@@ -146,6 +146,7 @@ window.onload = function() {
         // implement the camera UI
         if (uiMode.value == "ArcBall") {
             viewM = arcball.getMatrix();
+
             twgl.m4.setTranslation(viewM, [0, 0, -10], viewM);
         } else if (uiMode.value == "Drive") {
             if (keysdown[65]) { driveTheta += .02; }
@@ -164,6 +165,7 @@ window.onload = function() {
             }
 
             cameraM = twgl.m4.rotationY(driveTheta);
+            var driveTheta = driveTheta;
             twgl.m4.setTranslation(cameraM, drivePos, cameraM);
             viewM = twgl.m4.inverse(cameraM);
         }else if (uiMode.value == "Fly") {
@@ -238,6 +240,7 @@ window.onload = function() {
             timeOfDay : tod,
             sunDirection : sunDirection,
             sunColor: sunColor,
+            sunAngle: sunAngle,
             realtime : realtime
         }
 
