@@ -117,23 +117,25 @@ var Tree = undefined;
                 );
 
                 //bottom of trunk
-                tris.push(new Tri(bottom_center, bottom_this_it, bottom_next_it, trunk_color));
+                tris.push(new Tri(bottom_center, bottom_this_it, bottom_next_it));
 
                 //side of trunk - one rectangle, two tris
-                tris.push(new Tri(bottom_next_it, bottom_this_it, top_trunk_this_it, trunk_color));
-                tris.push(new Tri(top_trunk_this_it, top_trunk_next_it, bottom_next_it, trunk_color));
+                tris.push(new Tri(bottom_next_it, bottom_this_it, top_trunk_this_it));
+                tris.push(new Tri(top_trunk_this_it, top_trunk_next_it, bottom_next_it));
 
                 //bottom of leaves - same story, though it's a trapezoid, not a rectangle
-                tris.push(new Tri(top_trunk_next_it, top_trunk_this_it, bottom_leaves_this_it, leaves_color));
-                tris.push(new Tri(bottom_leaves_this_it, bottom_leaves_next_it, top_trunk_next_it, leaves_color));
+                tris.push(new Tri(top_trunk_next_it, top_trunk_this_it, bottom_leaves_this_it));
+                tris.push(new Tri(bottom_leaves_this_it, bottom_leaves_next_it, top_trunk_next_it));
 
                 //side of tree - only one tri per iteration!
-                tris.push(new Tri(bottom_leaves_next_it, bottom_leaves_this_it, top_of_tree, leaves_color));
+                tris.push(new Tri(bottom_leaves_next_it, bottom_leaves_this_it, top_of_tree));
             }
 
             var vertices = [];
+            var tex_coords = [];
             for (var i = 0; i < tris.length; i++) {
                 vertices = vertices.concat(tris[i].getVertexArray());
+                tex_coords = tex_coords.concat(tris[i].getTexCoordArray());
             }
 
             var normals = [];
@@ -152,6 +154,7 @@ var Tree = undefined;
 
             var arrays = {
                 a_pos : { numComponents: 3, data: vertices },
+                a_tex : { numComponents: 2, data: tex_coords },
                 a_normal : { numComponents:3, data: normals },
                 a_color : {numComponents:3, data: colors }
             };
