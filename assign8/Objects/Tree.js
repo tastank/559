@@ -58,48 +58,63 @@ var Tree = undefined;
                 var theta = 2*Math.PI/this.resolution*i;
                 var next_theta = 2*Math.PI/this.resolution*(i+1);
 
-                var bottom_center = new Point(0,0,0);
-                var bottom_this_it = new Point(
+                var bottom_center = new Vertex(0,0,0);
+                var bottom_this_it = new Vertex(
                     Math.cos(theta) * trunk_radius,
                     0,
-                    Math.sin(theta) * trunk_radius
-                    );
+                    Math.sin(theta) * trunk_radius,
+                    //Not sure I want to use parseInt
+                    parseInt(100*theta),
+                    0
+                );
 
-                var bottom_next_it = new Point(
+                var bottom_next_it = new Vertex(
                     Math.cos(next_theta) * trunk_radius,
                     0,
-                    Math.sin(next_theta) * trunk_radius
-                    );
+                    Math.sin(next_theta) * trunk_radius,
+                    parseInt(100*next_theta),
+                    0
+                );
 
-                var top_trunk_this_it = new Point(
+                var top_trunk_this_it = new Vertex(
                     Math.cos(theta) * trunk_radius,
                     trunk_height,
-                    Math.sin(theta) * trunk_radius
-                    );
+                    Math.sin(theta) * trunk_radius,
+                    parseInt(100*theta),
+                    49
+                );
 
-                var top_trunk_next_it = new Point (
+                var top_trunk_next_it = new Vertex (
                     Math.cos(next_theta) * trunk_radius,
                     trunk_height,
-                    Math.sin(next_theta) * trunk_radius
-                    );
+                    Math.sin(next_theta) * trunk_radius,
+                    parseInt(100*next_theta),
+                    49
+                );
 
-                var bottom_leaves_this_it = new Point (
+                var bottom_leaves_this_it = new Vertex (
                     Math.cos(theta) * leaves_radius,
                     trunk_height,
-                    Math.sin(theta) * leaves_radius
-                    );
+                    Math.sin(theta) * leaves_radius,
+                    parseInt(100*theta),
+                    50
+                );
 
-                var bottom_leaves_next_it = new Point (
+                var bottom_leaves_next_it = new Vertex (
                     Math.cos(next_theta) * leaves_radius,
                     trunk_height,
-                    Math.sin(next_theta) * leaves_radius
-                    );
+                    Math.sin(next_theta) * leaves_radius,
+                    parseInt(100*next_theta),
+                    50
+                );
 
-                var top_of_tree = new Point (
+                var top_of_tree = new Vertex (
                     0,
                     tree_height,
-                    0
-                    );
+                    0,
+                    314,
+                    150
+                );
 
                 //bottom of trunk
                 tris.push(new Tri(bottom_center, bottom_this_it, bottom_next_it, trunk_color));
