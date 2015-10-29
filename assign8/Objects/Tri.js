@@ -43,6 +43,14 @@ Tri.prototype.getVertexArray = function() {
   ];
 }
 
+Tri.prototype.getTexCoordArray = function() {
+    return [
+        this.p1.u, this.p1.v,
+        this.p2.u, this.p2.v,
+        this.p3.u, this.p3.v
+    ];
+}
+
 Tri.prototype.getColor = function() {
     return this.color;
 }
