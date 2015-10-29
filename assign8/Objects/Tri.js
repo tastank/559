@@ -2,9 +2,8 @@
 
 var v3 = twgl.v3;
 
-var Tri = function(p1, p2, p3, color) {
+var Tri = function(p1, p2, p3) {
     this.set(p1, p2, p3);
-    this.color = color;
 }
 
 Tri.prototype.set = function(p1, p2, p3) {
@@ -15,6 +14,7 @@ Tri.prototype.set = function(p1, p2, p3) {
     this.normal = v3.cross([p2.getX() - p1.getX(), p2.getY() - p1.getY(), p2.getZ() - p1.getZ()], [p3.getX() - p1.getX(), p3.getY() - p1.getY(), p3.getZ() - p1.getZ()]);
 }
 
+//I'll leave this in here in case I want to do more with it later
 Tri.prototype.setColor = function(color) {
     this.color = color;
 }
