@@ -48,7 +48,7 @@ var Sun = undefined;
         var gl=drawingState.gl;
         // create the shaders once - for all cubes
         if (!shaderProgram) {
-            shaderProgram = twgl.createProgramInfo(gl, ["world-vs", "world-fs"]);
+            shaderProgram = twgl.createProgramInfo(gl, ["ground-vs", "ground-fs"]);
         }
         if (!buffers) {
             var vertices = [];
@@ -102,8 +102,8 @@ var Sun = undefined;
                         1
                         );
 
-                    tris.push(new Tri(p1, p2, p3, sun_color));
-                    tris.push(new Tri(p1, p3, p4, sun_color));
+                    tris.push(new Tri(p1, p2, p3));
+                    tris.push(new Tri(p1, p3, p4));
                 }
             }
 
