@@ -202,8 +202,6 @@ var grobjects = grobjects || [];
         gl.bindTexture(gl.TEXTURE_2D, this.texture);
         gl.uniform1i(this.uniforms.uTexture, 0);
 
-
-
         enableLocations(gl, this.attributes)
 
         gl.bindBuffer(gl.ARRAY_BUFFER, this.buffers[0]);
