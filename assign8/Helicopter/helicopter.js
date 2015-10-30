@@ -8,20 +8,13 @@ var Copter = undefined;
 var Helipad = undefined;
 
 /* this file defines a helicopter object and a helipad object
-
 the helicopter is pretty ugly, and the rotor doesn't spin - but
 it is intentionally simply. it's ugly so that students can make
 it nicer!
-
 it does give an example of index face sets
-
 read a simpler object first.
-
-
 the helipad is a simple object for the helicopter to land on.
 there needs to be at least two helipads for the helicopter to work..
-
-
 the behavior of the helicopter is at the end of the file. it is
 an example of a more complex/richer behavior.
  */
@@ -49,7 +42,7 @@ an example of a more complex/richer behavior.
     var padBuffers = undefined;
     var padNumber = 0;
     var copter_image = new Image();
-    copter_image.src = "data:image/png;base64,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";
+    copter_image.src = "textures/copter.png";
 
     // constructor for Helicopter
     Copter = function Copter(name) {
@@ -61,7 +54,7 @@ an example of a more complex/richer behavior.
         this.texture = null;
     }
     Copter.prototype.init = function(drawingState) {
-        this.texture = createGLTexture(drawingState.gl, copter_image, true);
+        this.texture = createGLTexture(drawingState.gl, copter_image, false);
         var gl=drawingState.gl;
         var q = .25;  // abbreviation
 
@@ -94,8 +87,9 @@ an example of a more complex/richer behavior.
                 indices : [0,1,4, 1,2,4, 2,3,4, 3,0,4, 1,0,5, 2,1,5, 3,2,5, 0,3,5,
                            6,7,10, 7,8,10, 8,9,10, 9,6,10
                             ],
-                a_texcoord : {numComponents:3, data: 
-                    [60,30, 0,30, 60,30, 100,30, 60,0, 60,60, 75,30, 75,20, 75,30, 75,60, 128,30] 
+                a_texcoord : {numComponents:2, data: 
+                    [.469,.766,  0,.766,  .469,.766,  .781,.766,  .469,1,  .469,.531,
+                     .586,.766, .586,.844, .586,.766, .586,.531, 1,.766] 
                 }
             };
             copterBodyBuffers = twgl.createBufferInfoFromArrays(drawingState.gl,arrays);
@@ -104,7 +98,7 @@ an example of a more complex/richer behavior.
                 a_pos : {numComponents:3, data: [0,.5,0, 1,.5,.1, 1,.5, -.1,
                                                 0,.5,0, -1,.5,.1, -1,.5, -.1]},
                 a_normal : {numComponents:3, data: [0,1,0, 0,1,0, 0,1,0, 0,1,0, 0,1,0, 0,1,0]},
-                a_texcoord : {numComponents:2, data: [64,96, 127,102,  127,90, 64,96, 0,102, 0,90]},
+                a_texcoord : {numComponents:2, data: [.5,.25, 1,.24,  1,.26, .5,.25, 0,.24, 0,.26]},
                 indices : [0,1,2, 3,4,5]
             };
             copterRotorBuffers = twgl.createBufferInfoFromArrays(drawingState.gl,rarrays);
@@ -113,7 +107,7 @@ an example of a more complex/richer behavior.
                 a_pos : {numComponents:3, data: [-.1,0,0,   -.1, .3,-.05,  -.1, .3, .05,
                                                  -.1,0,0,   -.1,-.3, .05,  -.1,-.3, -.05]},
                 a_normal : {numComponents:3, data: [1,0,0, 1,0,0, 1,0,0, 1,0,0, 1,0,0, 1,0,0]},
-                a_texcoord : {numComponents:2, data: [64,96, 127,102,  127,90, 64,96, 0,102, 0,90]},
+                a_texcoord : {numComponents:2, data: [.5,.25, 1,.24,  1,.26, .5,.25, 0,.24, 0,.26]},
                 indices : [0,1,2, 3,4,5]
             };
             copterTailRotorBuffers = twgl.createBufferInfoFromArrays(drawingState.gl,trarrays);
@@ -144,6 +138,7 @@ an example of a more complex/richer behavior.
             u_specularness: fuse_specularness,
             u_shininess:    fuse_shininess,
             u_emittance:    0.0,
+            u_texture:      this.texture,
             u_view:drawingState.view,
             u_proj:drawingState.proj,
             u_lightdir:drawingState.sunDirection,
@@ -161,6 +156,7 @@ an example of a more complex/richer behavior.
             u_specularness: rotor_specularness,
             u_shininess:    rotor_shininess,
             u_emittance:    0.0,
+            u_texture:      this.texture,
             u_view:drawingState.view,
             u_proj:drawingState.proj,
             u_lightdir:drawingState.sunDirection,
@@ -179,6 +175,7 @@ an example of a more complex/richer behavior.
             u_specularness: rotor_specularness,
             u_shininess:    rotor_shininess,
             u_emittance:    0.0,
+            u_texture:      this.texture,
             u_view:drawingState.view,
             u_proj:drawingState.proj,
             u_lightdir:drawingState.sunDirection,
@@ -195,8 +192,7 @@ an example of a more complex/richer behavior.
 
 
     var pad_image = new Image();
-    pad_image.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAIAAABLbSncAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3wodECUBRK3QuAAAABl0RVh0Q29tbWVudABDcmVhdGVkIHdpdGggR0lNUFeBDhcAAAAsSURBVAjXY/z//z8DA0PSdFkGGJiX+ZiBgYGJAQfAKcEIMYoEHSwQihqWAwChyAwLl3MoywAAAABJRU5ErkJggg==";
-    pad_image.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAIAAABLbSncAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3wodEDYBJUKRKgAAABl0RVh0Q29tbWVudABDcmVhdGVkIHdpdGggR0lNUFeBDhcAAAA/SURBVAjXdY2xDYBAEMPs24PlvmMiOpZjkNA8CIl7l4mcGCAZx8bDuV9AkdBRLDBfQ9+BQv8pOo3ufEFXKHADUGYVCf3ORwsAAAAASUVORK5CYII=";
+    pad_image.src = "textures/pad.png";
 
     // constructor for Helipad
     // note that anything that has a helipad and helipadAltitude key can be used
@@ -231,7 +227,6 @@ an example of a more complex/richer behavior.
                 ] },
 
                 /*
-
              ________            _______
             |0      3|          |7     4|
             |        |          |       |
@@ -246,8 +241,6 @@ an example of a more complex/richer behavior.
             |        |          |       |
             |        |          |       |
             |1______2|          |6_____5|
-
-
                 */
                 a_normal : {numComponents:3, data: [
                     0,1,0, 0,1,0, 0,1,0, 0,1,0,
@@ -257,10 +250,10 @@ an example of a more complex/richer behavior.
                 indices : [0,1,2, 0,2,3, 4,5,6, 4,6,7, 8,9,10, 8,10,11
                             ],
                 a_texcoord : {numComponents: 2, data: [
-                    7,7, 7,0, 6,0, 
-                    6,7, 0,7, 0,0,
-                    1,0, 1,7, 6,4,
-                    6,3, 1,3, 1,4
+                    1,1, 1,0, .875,0, 
+                    .875,1, 0,1, 0,0,
+                    .125,0, .125,1, .875,.625,
+                    .875,.375, .125,.375, .125,.625
                     ]
                 }
             };
@@ -281,6 +274,7 @@ an example of a more complex/richer behavior.
             u_specularness: pad_specularness,
             u_shininess:    pad_shininess,
             u_emittance:    0.0,
+            u_texture:      this.texture,
             u_emittance_color:  drawingState.sunColor,
             u_view:drawingState.view,
             u_proj:drawingState.proj,
