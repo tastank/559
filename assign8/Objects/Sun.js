@@ -32,14 +32,19 @@ var Sun = undefined;
     var shaderProgram = undefined;
     var buffers = undefined;
 
+    var image = new Image();
+    image.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3woeAhcDSsQ9FQAAABl0RVh0Q29tbWVudABDcmVhdGVkIHdpdGggR0lNUFeBDhcAAAAWSURBVAjXY/z//z8DAwMTAwMDAwMDACQGAwG9HuO6AAAAAElFTkSuQmCC";
+
     // constructor for Cubes
     Sun = function Sun(name, position, size, resolution) {
         this.name = name;
         this.position = position || [0,0,0];
         this.size = size || 1.0;
         this.resolution = resolution;
+        this.texture = null;
     }
     Sun.prototype.init = function(drawingState) {
+        this.texture = createGLTexture(drawingState.gl, image, true);
         var gl=drawingState.gl;
         // create the shaders once - for all cubes
         if (!shaderProgram) {
@@ -65,28 +70,36 @@ var Sun = undefined;
                     var next_y = (i+1) / this.resolution * 2 * sun_radius - sun_radius;
 
 
-                    var p1 = new Point (
+                    var p1 = new Vertex (
                         Math.cos(theta) * scale * sun_radius,
                         y,
-                        Math.sin(theta) * scale * sun_radius
+                        Math.sin(theta) * scale * sun_radius,
+                        0,
+                        0
                         );
 
-                    var p2 = new Point (
+                    var p2 = new Vertex (
                         Math.cos(next_theta) * scale * sun_radius,
                         y,
-                        Math.sin(next_theta) * scale * sun_radius
+                        Math.sin(next_theta) * scale * sun_radius,
+                        1,
+                        0
                         );
 
-                    var p3 = new Point (
+                    var p3 = new Vertex (
                         Math.cos(next_theta) * next_scale * sun_radius,
                         next_y,
-                        Math.sin(next_theta) * next_scale * sun_radius
+                        Math.sin(next_theta) * next_scale * sun_radius,
+                        1,
+                        1
                         );
 
-                    var p4 = new Point (
+                    var p4 = new Vertex (
                         Math.cos(theta) * next_scale * sun_radius,
                         next_y,
-                        Math.sin(theta) * next_scale * sun_radius
+                        Math.sin(theta) * next_scale * sun_radius,
+                        0,
+                        1
                         );
 
                     tris.push(new Tri(p1, p2, p3, sun_color));
@@ -95,8 +108,10 @@ var Sun = undefined;
             }
 
             var vertices = [];
+            var tex_coords = [];
             for (var i = 0; i < tris.length; i++) {
                 vertices = vertices.concat(tris[i].getVertexArray());
+                tex_coords = tex_coords.concat(tris[i].getTexCoordArray());
             }
 
             var normals = [];
@@ -107,22 +122,21 @@ var Sun = undefined;
                 normals = normals.concat(tris[i].getNormal());
                 normals = normals.concat(tris[i].getNormal());
                 normals = normals.concat(tris[i].getNormal());
-                colors = colors.concat(tris[i].getColor());
-                colors = colors.concat(tris[i].getColor());
-                colors = colors.concat(tris[i].getColor());
             }
 
 
             var arrays = {
                 a_pos : { numComponents: 3, data: vertices },
                 a_normal : { numComponents:3, data: normals },
-                a_color : {numComponents:3, data: colors }
+                a_texcoord : {numComponents:2, data: tex_coords }
             };
             buffers = twgl.createBufferInfoFromArrays(drawingState.gl,arrays);
         }
 
     };
     Sun.prototype.draw = function(drawingState) {
+        drawingState.gl.activeTexture(drawingState.gl.TEXTURE0);
+        drawingState.gl.bindTexture(drawingState.gl.TEXTURE_2D, this.texture);
         // we make a model matrix to place the cube in the world
         var sun_alt = 10;
         this.position = [Math.cos(drawingState.sunAngle)*sun_alt, Math.sin(drawingState.sunAngle)*sun_alt, 0];
@@ -138,6 +152,7 @@ var Sun = undefined;
             u_shininess:    0.0,
             u_emittance:    1.0,
             u_emittance_color:  drawingState.sunColor,
+            u_texture:      this.texture,
             u_view:drawingState.view,
             u_proj:drawingState.proj,
             u_lightdir:drawingState.sunDirection,

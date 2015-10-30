@@ -48,6 +48,8 @@ an example of a more complex/richer behavior.
 
     var padBuffers = undefined;
     var padNumber = 0;
+    var copter_image = new Image();
+    copter_image.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHLAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3woeACERM+UJRgAAABl0RVh0Q29tbWVudABDcmVhdGVkIHdpdGggR0lNUFeBDhcAAAenSURBVHja7V09bxw3EH27S1gRLOC2M3CVKkHqgsS909hAABcH+AcYqtwklf9BABX6L6lVJ4Xa/A/1gi4CbpcpZF7Gc/zY1X3ojnwDCAKOtyR39s0M+Tg3WwGw2IIcHx/j8fERfd/jJaUG8BOAPwD8ioKkqgBrB+lnKzKfz1/84QNAD+AfALcoTKwdbCDZSw/gX1CWnqE0APwA4Ec+eq9nMCXc83sAv+RwI00D1BGb7funPzt8WVdtaxG4L/IzgD8BnNL2ywPAawB/fwMBpbBFoAHwOx9+/gCoAp9/BPCFz7fMEDD9tu9n3C8wBBwBuPY9/Kpa2QNTMtwGXgKYDdj/Ug44BBgAC7r+MkNAC6AZ4/r3VZpmL/o6OADMATx63FjQ9e+rdN1e9JXFLuACwA1df5m7gGMAV3z4ZQKgAvAZT4c9lAJDAA96CgbAawB/GYO3JHeGi7X/HxkDgDH7TwQ1VYVOkThNVeG3N2/wdjrlQ30OCBaLpz/sORNojMFisUr5fHz3Dl++fgUIgHxDQF3XsNbCKuufTqe4vb3F6Skj/0aMbOsIGxij5YNumgZ93688/KOjI1xfX/PhHxIA7DMOYToPs1VVFS4vLzGbzfjUStwFXFxc4Obmhta/6VB7EJOsa1xdXfHhH2IIWHsb2DSYzWZ4/55831YAcHZ2tpcTe/XqFabTKT58+IBPnz7h5OSET2sbawBrmSrDNQCFAKAQABQCgEIAUAgACgFAIQAoBACFAKAQABQCgEIAUAgACgFAIQAoBACFAKAQABQCgEIAUAgACgFAIQAoBACFAKAQABQCgEIAUAgACgFAIQAoBACFAKDsp1Tn5+f2/v4eDw8PK8UZXZFH999au3wlvGyrquq7qp7W2uXn8lr5nVh7qm/gqXKYvFb2IfuV1w8ZW7en+j50vdR3d3eYz+fLh26tRdd1yxuq63r5BwB93y//ZLvr2LXJAV173/foum7Zv2xzE5J9u/bU2LpdKsP175Tg2uu6RtM0aJpmWZbWtbm5y7713HLRS9W2rZXok6LrR/nKvvo8xtDrx7Snxtbf2eTYY/s+JL0Yhw6JKmcRDpHuImMMmm9vqJKodBalUa1R6azNoXKxWHhRK63Rzc1d627GWYy2CDe2tnZtEdrLGWO8FiXvKUe9VJPJxJaAdHqAgAfQ6JLI96HL1e936GqaZgXZMsa6OOaQLcONszoXd3UMTHkjY8x3Vtd13YrFyxjrxnEWLxdLzurcfPXaIFe9GLmClTcgESNRI9vWWUHr1bNcePnaZd9OZNs6K2h933Lhlb1eJpOJDa1cJbo08iW6YitTjWxtdbI9dn1obKkgXxz23ZdvbD232PVZ6SUVZzS6NPpT8Sm0H/dZZSqG+d4gopEdi32h/bjPKkvRS9W2rZXxRiJb7kXl6lkOoNEn46xUsA/5MpbJ8VN9S+RLBYTmLq+VsdBn8XLOJejFSFRIpGikx9pSSI/FXR/CpRX4kB5rS3mAWNwNsaA566WaTCY2RENqalhajY8CTVGceqGkkR+7Pja27n8IvaoXStojxK7PSS9Guxfp+jSCNDWq3WrItel27Z7cZzHXpy1DEjnaomIuX7drt+0+i4WEnPRStW1rSb6US0oZiWzSr+XR0vQApXuAsYdB69KvPqt7KfrVZ3UvRUu/lF6MdAnyBkJbGt/qWW5B3MR8hIbsV1Ocel8rbyC0pfGtnuXWTM5NL95kv5r61XvmnPViQkkLjlRw6HGTcDRlimZ06Bx76OFLWpBxVtKvjkJN0a+y7zGHQSXoxWgL8REJmuTQ7ZqA8PUZ+p4mZ/T3UmPrdt+YobH19zQ5U4Re3GFQiGaUrk2unH1pTr69duxARq/MU/SrHlu+Y1inf/n22rEDGb0yT9GvueilXnelObTNFzt97WNX4M9p88VOX3sRemnb1pJ+LZeWNtq9kH4ti5ZmTmDpOYES2aRfmRVMD8Cs4M3SrzFka6vbNv0aG1vPbdu09L7oZdBhUCiTdahlpH6fp4mLGHJDv3EbanWp3+f57itnvQw+DHLI1xToS+Tix7Jfd52Lf+h6MUNyzlM045hcfE1Hjs3FT1GgY3LxNf06Nhc/B70ks4LXohkVoaHjsDxw8WXmbpJ+1USPjsPywMWXmZurXlggonAZlBXsQ4+0jDH0a+p8PUW/+n7rLy1jDP2aOl8vQS/1usqIXR+akC584FPmc5QRu97nPnVc9hVlyF4v3AYWvg1kVnDhWcGkgnkYRKvjYRA9AA+DWCKGJWJCNCNLxLBEzEZKoQylX0O5+JssETOUfs1eL8zELTtDeXCJmBjNuOtSKEPmtqsSMYeuFzO0FEosroUYN32zqVIoOu7FrCQ0txDjpkGQKhGj1wO56mV5GBRaJKVyzndZoTuVi7/LCt256KVOVaJOLYh2WaE7tSDaZYXubPTCAhFlk1I8DAJLxNADgCViSL8WSksb0q9l09JLImib9OtQq9sF/TrU6nZBS++DXkwqlujPfURDqPzK2FIoqRgYim+pUig+ejVVIqYYvaRKxLBCd956qYcgnTX6M9YLS8RgpX+WiGGJGJaIIfnCrGDSr8wKpgdgVjArdGetl+UuIPfXpPP18da7XfwPvqVzPiUVa+MAAAAASUVORK5CYII=";
 
     // constructor for Helicopter
     Copter = function Copter(name) {
@@ -56,8 +58,10 @@ an example of a more complex/richer behavior.
         this.color = [.9,.3,.4];
         // about the Y axis - it's the facing direction
         this.orientation = 0;
+        this.texture = null;
     }
     Copter.prototype.init = function(drawingState) {
+        this.texture = createGLTexture(drawingState.gl, copter_image, true);
         var gl=drawingState.gl;
         var q = .25;  // abbreviation
 
@@ -67,6 +71,18 @@ an example of a more complex/richer behavior.
         }
         if (!copterBodyBuffers) {
             var arrays = {
+                //points in order:
+                //left fuse,
+                //front fuse,
+                //right fuse,
+                //back fuse
+                //top fuse
+                //bottom fuse
+                //left front boom
+                //top front boom
+                //right font boom
+                //bottom front boom
+                //rear of boom
                 a_pos : { numComponents: 3, data: [
                     .5, 0, 0,  0,0,.5,  -.5,0,0,  0,0, -.5, 0,.5,0,    0, -.5,0,
                     q,0,-q,  0,q,-q,  -q,0,-q,  0,-q,-q,  0,0,-1
@@ -78,8 +94,8 @@ an example of a more complex/richer behavior.
                 indices : [0,1,4, 1,2,4, 2,3,4, 3,0,4, 1,0,5, 2,1,5, 3,2,5, 0,3,5,
                            6,7,10, 7,8,10, 8,9,10, 9,6,10
                             ],
-                a_color : {numComponents:3, data: 
-                    [1,0,0, 1,0,0, 1,0,0, 1,0,0, 1,0,0, 1,0,0, 1,0,0, 1,0,0, 1,0,0, 1,0,0, 1,0,0, 1, 0, 0] 
+                a_texcoord : {numComponents:3, data: 
+                    [60,30, 0,30, 60,30, 100,30, 60,0, 60,60, 75,30, 75,20, 75,30, 75,60, 128,30] 
                 }
             };
             copterBodyBuffers = twgl.createBufferInfoFromArrays(drawingState.gl,arrays);
@@ -88,7 +104,7 @@ an example of a more complex/richer behavior.
                 a_pos : {numComponents:3, data: [0,.5,0, 1,.5,.1, 1,.5, -.1,
                                                 0,.5,0, -1,.5,.1, -1,.5, -.1]},
                 a_normal : {numComponents:3, data: [0,1,0, 0,1,0, 0,1,0, 0,1,0, 0,1,0, 0,1,0]},
-                a_color: {numComponents:3, data: [0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0]},
+                a_texcoord : {numComponents:2, data: [64,96, 127,102,  127,90, 64,96, 0,102, 0,90]},
                 indices : [0,1,2, 3,4,5]
             };
             copterRotorBuffers = twgl.createBufferInfoFromArrays(drawingState.gl,rarrays);
@@ -97,7 +113,7 @@ an example of a more complex/richer behavior.
                 a_pos : {numComponents:3, data: [-.1,0,0,   -.1, .3,-.05,  -.1, .3, .05,
                                                  -.1,0,0,   -.1,-.3, .05,  -.1,-.3, -.05]},
                 a_normal : {numComponents:3, data: [1,0,0, 1,0,0, 1,0,0, 1,0,0, 1,0,0, 1,0,0]},
-                a_color: {numComponents:3, data: [0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0]},
+                a_texcoord : {numComponents:2, data: [64,96, 127,102,  127,90, 64,96, 0,102, 0,90]},
                 indices : [0,1,2, 3,4,5]
             };
             copterTailRotorBuffers = twgl.createBufferInfoFromArrays(drawingState.gl,trarrays);
@@ -112,6 +128,8 @@ an example of a more complex/richer behavior.
 
     };
     Copter.prototype.draw = function(drawingState) {
+        drawingState.gl.activeTexture(drawingState.gl.TEXTURE0);
+        drawingState.gl.bindTexture(drawingState.gl.TEXTURE_2D, this.texture);
         // make the helicopter fly around
         // this will change position and orientation
         advance(this,drawingState);
@@ -175,6 +193,11 @@ an example of a more complex/richer behavior.
     }
 
 
+
+    var pad_image = new Image();
+    pad_image.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAIAAABLbSncAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3wodECUBRK3QuAAAABl0RVh0Q29tbWVudABDcmVhdGVkIHdpdGggR0lNUFeBDhcAAAAsSURBVAjXY/z//z8DA0PSdFkGGJiX+ZiBgYGJAQfAKcEIMYoEHSwQihqWAwChyAwLl3MoywAAAABJRU5ErkJggg==";
+    pad_image.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAIAAABLbSncAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3wodEDYBJUKRKgAAABl0RVh0Q29tbWVudABDcmVhdGVkIHdpdGggR0lNUFeBDhcAAAA/SURBVAjXdY2xDYBAEMPs24PlvmMiOpZjkNA8CIl7l4mcGCAZx8bDuV9AkdBRLDBfQ9+BQv8pOo3ufEFXKHADUGYVCf3ORwsAAAAASUVORK5CYII=";
+
     // constructor for Helipad
     // note that anything that has a helipad and helipadAltitude key can be used
     Helipad = function Helipad(position) {
@@ -186,8 +209,10 @@ an example of a more complex/richer behavior.
         // what altitude should the helicopter be?
         // this get added to the helicopter size
         this.helipadAltitude = 0;
+        this.texture = null;
     }
     Helipad.prototype.init = function(drawingState) {
+        this.texture = createGLTexture(drawingState.gl, pad_image, false);
         var gl=drawingState.gl;
         var q = .25;  // abbreviation
 
@@ -198,11 +223,32 @@ an example of a more complex/richer behavior.
         if (!padBuffers) {
             var arrays = {
                 a_pos : { numComponents: 3, data: [
-                    -1,0,-1, -1,0,1, -.5,0,1, -.5,0,-1,
-                    1,0,-1, 1,0,1, .5,0,1, .5,0,-1,
-                    -.5,0,-.25, -.5,0,.25,.5,0,.25,.5,0, -.25
+                    -1,  0,-1,    -1,  0, 1,    -0.5,0,   1, //0,1,2
+                    -0.5,0,-1,     1,  0,-1,     1,  0, 1,   //3,4,5
+                     0.5,0, 1,     0.5,0,-1,    -0.5,0,-0.25,//6,7,8
+                    -0.5,0, 0.25,  0.5,0, 0.25,  0.5,0,-0.25 //9,10,11
 
                 ] },
+
+                /*
+
+             ________            _______
+            |0      3|          |7     4|
+            |        |          |       |
+            |        |          |       |
+            |        |          |       |
+            |        |__________|       |
+            |        8          11      |
+            |                           |
+            |        9__________10      |
+            |        |          |       |
+            |        |          |       |
+            |        |          |       |
+            |        |          |       |
+            |1______2|          |6_____5|
+
+
+                */
                 a_normal : {numComponents:3, data: [
                     0,1,0, 0,1,0, 0,1,0, 0,1,0,
                     0,1,0, 0,1,0, 0,1,0, 0,1,0,
@@ -210,10 +256,11 @@ an example of a more complex/richer behavior.
                 ]},
                 indices : [0,1,2, 0,2,3, 4,5,6, 4,6,7, 8,9,10, 8,10,11
                             ],
-                a_color : {numComponents: 3, data: [
-                    1,1,1, 1,1,1, 1,1,1, 1,1,1,
-                    1,1,1, 1,1,1, 1,1,1, 1,1,1,
-                    1,1,1, 1,1,1, 1,1,1, 1,1,1
+                a_texcoord : {numComponents: 2, data: [
+                    7,7, 7,0, 6,0, 
+                    6,7, 0,7, 0,0,
+                    1,0, 1,7, 6,4,
+                    6,3, 1,3, 1,4
                     ]
                 }
             };
@@ -222,6 +269,8 @@ an example of a more complex/richer behavior.
 
     };
     Helipad.prototype.draw = function(drawingState) {
+        drawingState.gl.activeTexture(drawingState.gl.TEXTURE0);
+        drawingState.gl.bindTexture(drawingState.gl.TEXTURE_2D, this.texture);
         // we make a model matrix to place the cube in the world
         var modelM = twgl.m4.scaling([this.size,this.size,this.size]);
         twgl.m4.setTranslation(modelM,this.position,modelM);

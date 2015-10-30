@@ -38,11 +38,15 @@ var groundPlaneSize = groundPlaneSize || 5;
         -groundPlaneSize, 0,  groundPlaneSize
     ];
 
-    var ground_color = [0.1, 0.1, 0.0];
-    var color = [];
-    for (var i = 0; i < 6; i++) {
-        color = color.concat(ground_color);
-    }
+    var tex_coord = [
+        0,0,
+        1,0,
+        1,1,
+        0,0,
+        1,1,
+        0,1
+    ];
+
 
     // since there will be one of these, just keep info in the closure
     var shaderProgram = undefined;
@@ -55,6 +59,8 @@ var groundPlaneSize = groundPlaneSize || 5;
     // another stylistic choice: I have chosen to make many of my "private" variables
     // fields of this object, rather than local variables in this scope (so they
     // are easily available by closure).
+    var image = new Image();
+    image.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3wodEB4ECHXLDwAAABl0RVh0Q29tbWVudABDcmVhdGVkIHdpdGggR0lNUFeBDhcAAAAWSURBVAjXY0ycJsPAwMDEwMDAwMAAAA1TARfd3Sk3AAAAAElFTkSuQmCC";
     var ground = {
         // first I will give this the required object stuff for it's interface
         // note that the init and draw functions can refer to the fields I define
@@ -63,23 +69,28 @@ var groundPlaneSize = groundPlaneSize || 5;
         // the two workhorse functions - init and draw
         // init will be called when there is a GL context
         // this code gets really bulky since I am doing it all in place
+
+
         init : function(drawingState) {
             // an abbreviation...
             var gl = drawingState.gl;
             if (!shaderProgram) {
                 shaderProgram = twgl.createProgramInfo(gl,["world-vs","world-fs"]);
             }
+            this.texture = createGLTexture(gl, image, true);
             var arrays = { 
                 a_pos : {numComponents:3, data:vertexPos },
                 a_normal: {numComponents:3, data:
                     [0,1,0, 0,1,0, 0,1,0,
                      0,1,0, 0,1,0, 0,1,0]
                 },
-                a_color: {numComponents:3, data: color},
+                a_texcoord: {numComponents:2, data: tex_coord},
             };
             buffers = twgl.createBufferInfoFromArrays(gl,arrays);
         },
         draw : function(drawingState) {
+            drawingState.gl.activeTexture(drawingState.gl.TEXTURE0);
+            drawingState.gl.bindTexture(drawingState.gl.TEXTURE_2D, this.texture);
             var modelM = twgl.m4.identity();
             var gl = drawingState.gl;
             gl.useProgram(shaderProgram.program);
@@ -89,6 +100,7 @@ var groundPlaneSize = groundPlaneSize || 5;
                 u_shininess:    0.0,
                 u_emittance:    0.0,
                 u_emittance_color:  drawingState.sunColor,
+                u_texture:      this.texture,
                 u_view:drawingState.view,
                 u_proj:drawingState.proj,
                 u_lightdir:drawingState.sunDirection,
