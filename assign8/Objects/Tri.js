@@ -14,11 +14,6 @@ Tri.prototype.set = function(p1, p2, p3) {
     this.normal = v3.cross([p2.getX() - p1.getX(), p2.getY() - p1.getY(), p2.getZ() - p1.getZ()], [p3.getX() - p1.getX(), p3.getY() - p1.getY(), p3.getZ() - p1.getZ()]);
 }
 
-//I'll leave this in here in case I want to do more with it later
-Tri.prototype.setColor = function(color) {
-    this.color = color;
-}
-
 Tri.prototype.getNormal = function() {
   return Array.prototype.slice.call(this.normal);
 }
@@ -44,11 +39,11 @@ Tri.prototype.getVertexArray = function() {
 }
 
 Tri.prototype.getTexCoordArray = function() {
-    return [
-        this.p1.u, this.p1.v,
-        this.p2.u, this.p2.v,
-        this.p3.u, this.p3.v
-    ];
+  return [
+    this.p1.u, this.p1.v,
+    this.p2.u, this.p2.v,
+    this.p3.u, this.p3.v
+  ];
 }
 
 Tri.prototype.getColor = function() {
