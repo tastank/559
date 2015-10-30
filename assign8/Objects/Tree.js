@@ -47,7 +47,7 @@ var Tree = undefined;
         var gl=drawingState.gl;
         // create the shaders once - for all cubes
         if (!shaderProgram) {
-            shaderProgram = twgl.createProgramInfo(gl, ["ground-vs", "ground-fs"]);
+            shaderProgram = twgl.createProgramInfo(gl, ["world-vs", "world-fs"]);
         }
         if (!buffers) {
             var vertices = [];
@@ -205,8 +205,8 @@ var Tree = undefined;
 // rid of cubes, just don't load this file.
 for (var i = -4; i <= 4; i++) {
     for (var j = -4; j <= 4; j++ ){
-        if ((Math.abs(i) < 2 || Math.abs(j) < 2) && (i % 2 == 0 && j % 2 == 0)) {
-            grobjects.push(new Tree("tree"+i+"-"+j,[i, 0, j],1, 50) );
+        if (Math.abs(i) < 2 || Math.abs(j) < 2) {
+            grobjects.push(new Tree("tree"+i+"-"+j,[i, 0, j],1, 200) );
         }
     }
 }

@@ -75,7 +75,7 @@ var groundPlaneSize = groundPlaneSize || 5;
             // an abbreviation...
             var gl = drawingState.gl;
             if (!shaderProgram) {
-                shaderProgram = twgl.createProgramInfo(gl,["ground-vs","ground-fs"]);
+                shaderProgram = twgl.createProgramInfo(gl,["world-vs","world-fs"]);
             }
             this.texture = createGLTexture(gl, image, true);
             var arrays = { 

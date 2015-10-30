@@ -48,7 +48,7 @@ var Sun = undefined;
         var gl=drawingState.gl;
         // create the shaders once - for all cubes
         if (!shaderProgram) {
-            shaderProgram = twgl.createProgramInfo(gl, ["ground-vs", "ground-fs"]);
+            shaderProgram = twgl.createProgramInfo(gl, ["world-vs", "world-fs"]);
         }
         if (!buffers) {
             var vertices = [];
