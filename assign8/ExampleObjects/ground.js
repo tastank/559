@@ -40,11 +40,11 @@ var groundPlaneSize = groundPlaneSize || 5;
 
     var tex_coord = [
         0,0,
-        1,0,
+        0,1,
         1,1,
         0,0,
         1,1,
-        0,1
+        1,0
     ];
 
 
@@ -60,7 +60,7 @@ var groundPlaneSize = groundPlaneSize || 5;
     // fields of this object, rather than local variables in this scope (so they
     // are easily available by closure).
     var image = new Image();
-    image.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3wodEB4ECHXLDwAAABl0RVh0Q29tbWVudABDcmVhdGVkIHdpdGggR0lNUFeBDhcAAAAWSURBVAjXY0ycJsPAwMDEwMDAwMAAAA1TARfd3Sk3AAAAAElFTkSuQmCC";
+    image.src = "textures/grass.png";
     var ground = {
         // first I will give this the required object stuff for it's interface
         // note that the init and draw functions can refer to the fields I define
@@ -75,7 +75,7 @@ var groundPlaneSize = groundPlaneSize || 5;
             // an abbreviation...
             var gl = drawingState.gl;
             if (!shaderProgram) {
-                shaderProgram = twgl.createProgramInfo(gl,["world-vs","world-fs"]);
+                shaderProgram = twgl.createProgramInfo(gl,["ground-vs","ground-fs"]);
             }
             this.texture = createGLTexture(gl, image, true);
             var arrays = { 
@@ -121,3 +121,18 @@ var groundPlaneSize = groundPlaneSize || 5;
     // now that we've defined the object, add it to the global objects list
     grobjects.push(ground);
 })();
+
+
+var createGLTexture = function (gl, image, flipY) {
+    var texture = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    if(flipY){
+        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+    }
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER,  gl.LINEAR);
+    gl.generateMipmap(gl.TEXTURE_2D);
+    gl.bindTexture(gl.TEXTURE_2D, null);
+    return texture;
+}

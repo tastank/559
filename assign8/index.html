@@ -9,16 +9,19 @@
 </head>
 <body>
 <!-- load this stuff first -->
+<img src="textures/grass.png" id="ground-texture" hidden/>
+
 <script src="Libraries/twgl-full.js"></script>
 <script src="Libraries/panel.js"></script>
 <script src="Libraries/arcball.js"></script>
 <script src="grobject.js"></script>
+<script src="ExampleObjects/texturedplane.js"></script>
 <script src="ExampleObjects/ground.js"></script>
+<script src="Objects/Vertex.js"></script>
 <script src="Objects/Point.js"></script>
 <script src="Objects/Tri.js"></script>
 
 <!-- This is where we load the objects for the world -->
-<script src="ExampleObjects/texturedplane.js"></script>
 <script src="Objects/Tree.js"></script>
 <script src="Objects/Sun.js"></script>
 
@@ -28,200 +31,6 @@
 <!-- This gets loaded LAST (actually, it probably doesn't have to) -->
 <script src="graphicstown.js"></script>
 </body>
-
-<!-- all of the shaders get stuck here in the HTML because
-     that's the only way I know to load them without either
-     sticking them in JavaScript strings, or using a web server
-  -->
-
-<script id="cube-vs" type="notjs">
-// specialized shader for the simple cube
-// we assume that the model matrix works as the normal
-//      matrix - this only is try if the model matrix
-//      it a rotate/translate
-//      (uniform scale is OK since we re-normalize)
-// color is solid
-// simple lighting
-    precision highp float;
-
-    attribute vec3 vpos;
-    attribute vec3 vnormal;
-    varying vec3 outColor;
-
-    uniform mat4 view;
-    uniform mat4 proj;
-    uniform mat4 model;
-    uniform vec3 lightdir;
-    uniform vec3 cubecolor;
-
-
-    void main(void) {
-        gl_Position = proj * view * model * vec4(vpos, 1.0);
-        vec4 normal = normalize(model * vec4(vnormal,0.0));
-        float diffuse = .5 + .5*abs(dot(normal, vec4(lightdir,0.0)));
-        outColor = cubecolor * diffuse;
-    }
-</script>
-<script id="cube-fs" type="notjs">
-// simple shader that does vertex coloring
-//  (e.g. the vertex shader figures the lighting
-// note this is used for more than just the cube
-    precision highp float;
-    varying vec3 outColor;
-    void main(void) {
-        gl_FragColor = vec4(outColor, 1.0);
-    }
-</script>
-
-
-
-
-<!--Tree shaders!! -->
-<script id="tree-vs" type="notjs">
-precision highp float;
-attribute vec3 vpos;
-attribute vec3 vnormal;
-attribute vec3 vcolor;
-
-//uniform mat4 u_normal_matrix;
-uniform mat4 view;
-uniform mat4 model;
-uniform mat4 proj;
-uniform vec3 lightdir;
-
-varying vec3 v_pos;
-varying vec3 v_norm;
-varying vec3 v_color;
-
-mat3 normal_matrix;
-
-void main()
-{
-  normal_matrix[0] = model[0].xyz;
-  normal_matrix[1] = model[1].xyz;
-  normal_matrix[2] = model[2].xyz;
-
-  v_norm = normalize(normal_matrix * vnormal);
-  vec4 pos = model * vec4(vpos, 1.0);
-  vec3 v_pos = pos.xyz;
-  pos = proj * view * pos;
-  v_color = vcolor;
-  gl_Position = proj * view * model * vec4(vpos, 1.0);
-}
-</script>
-<script id="tree-fs" type="notjs">
-precision highp float;
-
-varying vec3 v_pos;
-varying vec3 v_norm;
-varying vec3 v_color;
-
-uniform vec3 lightdir;
-
-vec3 eye_pos = vec3(0.0, 0.0, 1.0);
-//the above should be passed as a parameter to the shader and could be easily enough, but I need sleep more than to comb through the drawing code again
-vec3 specular_light = vec3(0.0, 1.0, 1.0);
-vec3 specular_color = v_color;
-vec3 halfway = normalize(eye_pos + specular_light);
-float shininess = 20.0;
-
-vec3 diffuse_light = lightdir;
-vec3 diffuse_color = v_color;
-
-void main()
-{
-  float specular_shade = max(0.0, pow(dot(v_norm, halfway), shininess));
-  float diffuse_shade = max(0.0, dot(diffuse_light, v_norm));
-  
-  
-  float ambient_shade = 0.5;
-  vec3 specular_fragcolor = specular_shade*specular_color;
-  vec3 diffuse_fragcolor = (diffuse_shade + ambient_shade)*diffuse_color;
-  float specularness = 0.0;
-  vec3 color = (specular_fragcolor*specularness + diffuse_fragcolor*(1.0-specularness))/(1.0 + ambient_shade);
-  gl_FragColor = vec4(color, 1.0);
-}
-</script>
-
-
-
-<script id="copter-vs" type="notjs">
-precision highp float;
-attribute vec3 vpos;
-attribute vec3 vnormal;
-attribute vec3 vcolor;
-
-//uniform mat4 u_normal_matrix;
-uniform float u_specularness;
-uniform mat4 u_view;
-uniform mat4 u_model;
-uniform mat4 u_proj;
-uniform vec3 u_lightdir;
-
-varying vec3 v_pos;
-varying vec3 v_norm;
-varying vec3 v_color;
-
-mat3 normal_matrix;
-
-void main()
-{
-  normal_matrix[0] = u_model[0].xyz;
-  normal_matrix[1] = u_model[1].xyz;
-  normal_matrix[2] = u_model[2].xyz;
-
-  v_norm = normalize(normal_matrix * vnormal);
-  vec4 pos = u_model * vec4(vpos, 1.0);
-//  vec3 v_pos = pos.xyz;
-  //todo: not sure if I want this - perhaps vpos should be the following result
-  pos = u_proj * u_view * pos;
-  vec3 v_pos = pos.xyz;
-  v_color = vcolor;
-  gl_Position = pos;
-  //gl_Position = u_proj * u_view * model * vec4(vpos, 1.0);
-}
-</script>
-<script id="copter-fs" type="notjs">
-precision highp float;
-
-varying vec3 v_pos;
-varying vec3 v_norm;
-varying vec3 v_color;
-
-uniform vec3 u_lightdir;
-uniform float u_specularness;
-uniform vec3 u_suncolor;
-
-//todo: fix this - should be a uniform from program
-vec3 eye_pos = vec3(0.0, 1.0, 1.0);
-//the above should be passed as a parameter to the shader and could be easily enough, but I need sleep more than to comb through the drawing code again
-vec3 specular_light = u_lightdir;
-//todo: this should be a uniform as well
-//sunlight color
-vec3 specular_color = u_suncolor;
-vec3 halfway = normalize(eye_pos + specular_light);
-//this should also probably be a uniform
-float shininess = 20.0;
-
-vec3 diffuse_light = u_lightdir;
-vec3 diffuse_color = v_color;
-
-void main()
-{
-  float specular_shade = max(0.0, pow(dot(v_norm, halfway), shininess));
-  float diffuse_shade = max(0.0, dot(diffuse_light, v_norm));
-  
-  vec3 suncolor = normalize(u_suncolor) * 3.0;
-  
-  float ambient_shade = 0.5;
-  vec3 specular_fragcolor = specular_shade*specular_color;
-  vec3 diffuse_fragcolor = (diffuse_shade + ambient_shade)*diffuse_color*suncolor;
-  float specularness = u_specularness;
-  vec3 color = (specular_fragcolor*specularness + diffuse_fragcolor*(1.0-specularness))/(1.0 + ambient_shade);
-  gl_FragColor = vec4(color, 1.0);
-}
-</script>
-
 
 
 
@@ -323,33 +132,121 @@ void main()
      checkerboard
   -->
 <script id="ground-vs" type="not-js">
-    precision highp float;
 
-    attribute vec3 vpos;
-    varying vec3 outPos;
 
-    uniform mat4 view;
-    uniform mat4 proj;
+//maybe not the fastest, but I prefer the simplicity of having one highly
+//customizable shader take care of everything and passing it a bunch of
+//data for each point that needs to be different.
+//This allows me to make a single implementation of e.g. sun color changing
+//and not have to copypasta it all over the place.
+precision highp float;
+attribute vec3 a_pos;
+attribute vec2 a_texcoord;
+attribute vec3 a_normal;
 
-    void main(void) {
-        gl_Position = proj * view * vec4(vpos, 1.0);
-        outPos = vpos;
-    }
+//uniform mat4 u_normal_matrix;
+uniform float u_specularness;
+uniform float u_shininess;
+uniform mat4 u_view;
+uniform mat4 u_model;
+uniform mat4 u_proj;
+uniform vec3 u_lightdir;
+
+varying vec3 v_pos;
+varying vec3 v_norm;
+varying vec3 v_color;
+varying vec2 v_texcoord;
+
+mat3 normal_matrix;
+
+void main()
+{
+  normal_matrix[0] = u_model[0].xyz;
+  normal_matrix[1] = u_model[1].xyz;
+  normal_matrix[2] = u_model[2].xyz;
+
+  v_texcoord = a_texcoord;
+  v_norm = normalize(normal_matrix * a_normal);
+  vec4 pos = u_model * vec4(a_pos, 1.0);
+//  vec3 v_pos = pos.xyz;
+  //todo: not sure if I want this - perhaps vpos should be the following result
+  pos = u_proj * u_view * pos;
+  vec3 v_pos = pos.xyz;
+  gl_Position = pos;
+  //gl_Position = u_proj * u_view * model * vec4(vpos, 1.0);
+}
+
+
+
+
 </script>
-<script id="ground-fs" type="notjs">
-    // note this is used for more than just the cube
-    precision highp float;
-    varying vec3 outPos;
-    void main(void) {
-        float xs = step(1.0,mod(outPos.x,2.0));
-        float zs = step(1.0,mod(outPos.z,2.0));
-        float ss = (xs>.5) ? zs : 1.0-zs;
-        gl_FragColor = mix(vec4(0.5,0.5,0.5,1),
-                           vec4(0.3,0.5,0.4,1),
-                           ss
-                           );
 
-    }
+<script id="ground-fs" type="notjs">
+
+
+
+
+
+
+precision highp float;
+
+varying vec3 v_pos;
+varying vec2 v_texcoord;
+varying vec3 v_norm;
+
+uniform vec3 u_lightdir;
+uniform float u_specularness;
+uniform vec3 u_suncolor;
+uniform float u_shininess;
+uniform float u_emittance;
+uniform vec3 u_emittance_color;
+uniform float u_sunlight;
+uniform sampler2D u_texture;
+
+//todo: fix this - should be a uniform from program
+vec3 eye_pos = vec3(0.0, 1.0, 1.0);
+//the above should be passed as a parameter to the shader and could be easily enough, but I need sleep more than to comb through the drawing code again
+vec3 specular_light = u_lightdir;
+//todo: this should be a uniform as well
+//sunlight color
+vec3 specular_color = u_suncolor;
+vec3 halfway = normalize(eye_pos + specular_light);
+//this should also probably be a uniform
+
+vec3 diffuse_light = u_lightdir;
+vec3 diffuse_color = vec3(1.0,1.0,1.0);
+
+void main()
+{
+  vec4 tex_color = texture2D(u_texture, v_texcoord);
+
+  float specular_shade = max(0.0, pow(dot(v_norm, halfway), u_shininess));
+  float diffuse_shade = max(0.0, dot(diffuse_light, v_norm) * u_sunlight);
+  
+  vec3 suncolor = normalize(u_suncolor) * 3.0;
+  
+  float ambient_shade = 0.2;
+  vec3 specular_fragcolor = specular_shade*specular_color*u_sunlight;
+  vec3 diffuse_fragcolor = (diffuse_shade + ambient_shade)*diffuse_color*suncolor*tex_color.rgb + suncolor * 0.1;
+
+  float specularness = u_specularness;
+  vec3 color = (specular_fragcolor*specularness + diffuse_fragcolor*(1.0-specularness))/(1.0 + ambient_shade)*(1.0 - u_emittance);
+  color += u_emittance * u_emittance_color;
+  gl_FragColor = vec4(color, 1.0);
+}
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
 </script>
 
 </html>
