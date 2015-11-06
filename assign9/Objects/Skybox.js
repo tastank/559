@@ -53,20 +53,20 @@ var Skybox = undefined;
 
             var size = this.size;
 
-            var ltr = new Vertex(-size,  size,  size, .75, .25);
-            var ltrt= new Vertex(-size,  size,  size, 0, 0);
-            var ltf = new Vertex(-size,  size, -size, 0, .25);
-            var ltfl= new Vertex(-size,  size, -size, 1, .25);
-            var lbr = new Vertex(-size, -size,  size, .75, .75);
-            var lbrb= new Vertex(-size, -size,  size, 0, 1);
-            var lbf = new Vertex(-size, -size, -size, 0, .75);
-            var lbfl= new Vertex(-size, -size, -size, 1, .75);
-            var rtr = new Vertex( size,  size,  size, .5, .75);
-            var rtrt= new Vertex( size,  size,  size, .25, 0);
-            var rtf = new Vertex( size,  size, -size, .25, .25);
-            var rbr = new Vertex( size, -size,  size, .5, .25);
-            var rbrb= new Vertex( size, -size,  size, .25, .1);
-            var rbf = new Vertex( size, -size, -size, .25, .75);
+            var ltr = new Vertex(-1,  1,  1, .75, .25);
+            var ltrt= new Vertex(-1,  1,  1, 0, 0);
+            var ltf = new Vertex(-1,  1, -1, 0, .25);
+            var ltfl= new Vertex(-1,  1, -1, 1, .25);
+            var lbr = new Vertex(-1, -1,  1, .75, .75);
+            var lbrb= new Vertex(-1, -1,  1, 0, 1);
+            var lbf = new Vertex(-1, -1, -1, 0, .75);
+            var lbfl= new Vertex(-1, -1, -1, 1, .75);
+            var rtr = new Vertex( 1,  1,  1, .5, .25);
+            var rtrt= new Vertex( 1,  1,  1, .25, 0);
+            var rtf = new Vertex( 1,  1, -1, .25, .25);
+            var rbr = new Vertex( 1, -1,  1, .5, .75);
+            var rbrb= new Vertex( 1, -1,  1, .25, 1);
+            var rbf = new Vertex( 1, -1, -1, .25, .75);
 
             //rear face
             tris.push(new Tri(ltr, rtr, lbr));
@@ -140,4 +140,4 @@ var Skybox = undefined;
 
 })();
 
-grobjects.push(new Skybox("skybox", 5));
+grobjects.push(new Skybox("skybox", 20));
