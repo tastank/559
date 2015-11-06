@@ -20,7 +20,7 @@ var grobjects = grobjects || [];
 // a global variable to set the ground plane size, so we can easily adjust it
 // in the html file (before things run
 // this is the +/- in the X and Z direction (so things will go from -5 to +5 by default)
-var groundPlaneSize = groundPlaneSize || 5;
+var groundPlaneSize = groundPlaneSize || 20;
 
 // now, I make a function that adds an object to that list
 // there's a funky thing here where I have to not only define the function, but also
@@ -61,6 +61,9 @@ var groundPlaneSize = groundPlaneSize || 5;
     // are easily available by closure).
     var image = new Image();
     image.src = "textures/grass.png";
+    var bump_image = new Image();
+    bump_image.src = "textures/grass_bump.png";
+
     var ground = {
         // first I will give this the required object stuff for it's interface
         // note that the init and draw functions can refer to the fields I define
@@ -75,9 +78,10 @@ var groundPlaneSize = groundPlaneSize || 5;
             // an abbreviation...
             var gl = drawingState.gl;
             if (!shaderProgram) {
-                shaderProgram = twgl.createProgramInfo(gl,["world-vs","world-fs"]);
+                shaderProgram = twgl.createProgramInfo(gl,["bump-vs","bump-fs"]);
             }
             this.texture = createGLTexture(gl, image, true);
+            this.bump_texture = createGLTexture(gl, bump_image, true);
             var arrays = { 
                 a_pos : {numComponents:3, data:vertexPos },
                 a_normal: {numComponents:3, data:
@@ -91,6 +95,8 @@ var groundPlaneSize = groundPlaneSize || 5;
         draw : function(drawingState) {
             drawingState.gl.activeTexture(drawingState.gl.TEXTURE0);
             drawingState.gl.bindTexture(drawingState.gl.TEXTURE_2D, this.texture);
+            //drawingState.gl.activeTexture(drawingState.gl.TEXTURE0);
+            //drawingState.gl.bindTexture(drawingState.gl.TEXTURE_2D, this.texture);
             var modelM = twgl.m4.identity();
             var gl = drawingState.gl;
             gl.useProgram(shaderProgram.program);
@@ -101,6 +107,7 @@ var groundPlaneSize = groundPlaneSize || 5;
                 u_emittance:    0.0,
                 u_emittance_color:  drawingState.sunColor,
                 u_texture:      this.texture,
+                u_bumpmap:      this.bump_texture,
                 u_view:drawingState.view,
                 u_proj:drawingState.proj,
                 u_lightdir:drawingState.sunDirection,

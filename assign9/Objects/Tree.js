@@ -33,6 +33,8 @@ var Tree = undefined;
     var buffers = undefined;
     var image = new Image();
     image.src = "textures/tree.png"
+    var bump_image = new Image();
+    bump_image.src = "textures/tree_bump.png"
 
     // constructor for Cubes
     Tree = function Tree(name, position, size, resolution) {
@@ -41,13 +43,15 @@ var Tree = undefined;
         this.size = size || 1.0;
         this.resolution = resolution;
         this.texture = null;
+        this.bump_texture = null;
     }
     Tree.prototype.init = function(drawingState) {
         this.texture = createGLTexture(drawingState.gl, image, true);
+        this.bump_texture = createGLTexture(drawingState.gl, bump_image, true);
         var gl=drawingState.gl;
         // create the shaders once - for all cubes
         if (!shaderProgram) {
-            shaderProgram = twgl.createProgramInfo(gl, ["world-vs", "world-fs"]);
+            shaderProgram = twgl.createProgramInfo(gl, ["bump-vs", "bump-fs"]);
         }
         if (!buffers) {
             var vertices = [];
@@ -158,7 +162,6 @@ var Tree = undefined;
                 a_pos : { numComponents: 3, data: vertices },
                 a_texcoord : { numComponents: 2, data: tex_coords },
                 a_normal : { numComponents:3, data: normals },
-            //    a_color : {numComponents:3, data: colors }
             };
             buffers = twgl.createBufferInfoFromArrays(drawingState.gl,arrays);
         }
@@ -184,6 +187,7 @@ var Tree = undefined;
             u_emittance:    0.0,
             u_emittance_color:  drawingState.sunColor,
             u_texture:      this.texture,
+            u_bumpmap:      this.bump_texture,
             u_view:drawingState.view,
             u_proj:drawingState.proj,
             u_lightdir:drawingState.sunDirection,
@@ -203,10 +207,10 @@ var Tree = undefined;
 // normally, this would happen in a "scene description" file
 // but I am putting it here, so that if you want to get
 // rid of cubes, just don't load this file.
-for (var i = -4; i <= 4; i++) {
-    for (var j = -4; j <= 4; j++ ){
-        if (Math.abs(i) < 2 || Math.abs(j) < 2) {
-            grobjects.push(new Tree("tree"+i+"-"+j,[i, 0, j],1, 200) );
+for (var i = -20; i <= 20; i+= 2) {
+    for (var j = -20; j <= 20; j+= 2 ){
+        if (Math.abs(i) > 11 || Math.abs(j) > 11) {
+            grobjects.push(new Tree("tree"+i+"-"+j,[i, 0, j],2, 50) );
         }
     }
 }
