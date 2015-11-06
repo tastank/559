@@ -138,7 +138,7 @@ var Sun = undefined;
         drawingState.gl.activeTexture(drawingState.gl.TEXTURE0);
         drawingState.gl.bindTexture(drawingState.gl.TEXTURE_2D, this.texture);
         // we make a model matrix to place the cube in the world
-        var sun_alt = 10;
+        var sun_alt = 15;
         this.position = [Math.cos(drawingState.sunAngle)*sun_alt, Math.sin(drawingState.sunAngle)*sun_alt, 0];
         var modelM = twgl.m4.scaling([this.size,this.size,this.size]);
         twgl.m4.setTranslation(modelM,this.position,modelM);
