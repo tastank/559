@@ -426,10 +426,10 @@ an example of a more complex/richer behavior.
 // make the objects and put them into the world
 // note that the helipads float above the floor to avoid z-fighting
 grobjects.push(new Copter());
-grobjects.push(new Helipad([3,.01,3]));
-grobjects.push(new Helipad([3,.01,-3]));
-grobjects.push(new Helipad([-3,.01,-3]));
-grobjects.push(new Helipad([-3,.01,3]));
+grobjects.push(new Helipad([10,.01,10]));
+grobjects.push(new Helipad([10,.01,-10]));
+grobjects.push(new Helipad([-10,.01,-10]));
+grobjects.push(new Helipad([-10,.01,10]));
 
 // just to show - if there's a cube, we can land on it
 var acube = findObj("cube1");
