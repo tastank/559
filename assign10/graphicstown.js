@@ -201,7 +201,9 @@ window.onload = function() {
         }
 
         // get lighting information
-        tod -= -0.001;
+        var time_rate = 0.001;
+        tod -= -time_rate;
+        if (tod >= 23.999) tod=0;
         var sunAngle = Math.PI * (tod-6)/12;
         var sunDirection = [Math.cos(sunAngle),Math.sin(sunAngle),0];
         //todo: this should make things turn yellow/orange as the sun goes down
