@@ -209,7 +209,7 @@ var Tree = undefined;
 // rid of cubes, just don't load this file.
 for (var i = -20; i <= 20; i+= 2) {
     for (var j = -20; j <= 20; j+= 2 ){
-        if (Math.abs(i) > 11 || Math.abs(j) > 11) {
+        if ((Math.abs(i) > 11 || Math.abs(j) > 11) && (j < -6 || j > -4)) {
             grobjects.push(new Tree("tree"+i+"-"+j,[i, 0, j],2, 50) );
         }
     }
