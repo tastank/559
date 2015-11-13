@@ -215,22 +215,3 @@ for (var i = -20; i <= 20; i+= 2) {
     }
 }
 
-
-//stolen from ../ExampleObjects/texturedplane.js
-//creates a gl texture from an image object. Sometiems the image is upside down so flipY is passed to optionally flip the data.
-//it's mostly going to be a try it once, flip if you need to. 
-var createGLTexture = function (gl, image, flipY) {
-    var texture = gl.createTexture();
-    gl.bindTexture(gl.TEXTURE_2D, texture);
-    if(flipY){
-        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-    }
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER,  gl.LINEAR);
-    gl.generateMipmap(gl.TEXTURE_2D);
-    gl.bindTexture(gl.TEXTURE_2D, null);
-    return texture;
-}
-
-
