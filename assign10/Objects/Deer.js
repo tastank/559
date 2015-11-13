@@ -32,9 +32,9 @@ var Deer = undefined;
     var shaderProgram = undefined;
     var buffers = undefined;
     var image = new Image();
-    image.src = "textures/deer.png"
+    image.src = "textures/deer.png";
     var bump_image = new Image();
-    bump_image.src = "textures/deer_bump.png"
+    bump_image.src = "textures/deer_bump.png";
 
     // constructor for Cubes
     Deer = function Deer(name, position, size) {
@@ -48,15 +48,16 @@ var Deer = undefined;
         this.texture = createGLTexture(drawingState.gl, image, true);
         this.bump_texture = createGLTexture(drawingState.gl, bump_image, true);
         var gl=drawingState.gl;
-        // create the shaders once - for all cubes
         if (!shaderProgram) {
             shaderProgram = twgl.createProgramInfo(gl, ["obj-vs", "obj-fs"]);
         }
         if (!buffers) {
-            var all_arrays = makeArraysFromOBJ("Deer.obj", true); ;
-            //I'm not concerned with the groups array
-            var arrays = [all_arrays.vertices, all_arrays.normals, all_arrays.texCoords];
-            var buffers = twgl.createBufferInfoFromArrays(drawingState.gl,arrays);
+            var all_arrays = makeArraysFromOBJ("Deer.obj", true);
+            var arrays = {
+                a_pos: { numComponents: 3, data: all_arrays.vpos.data},
+                a_texcoord: {numComponents: 2, data: all_arrays.vtex.data},
+                a_normal: {numComponents: 3, data: all_arrays.vnormal.data}
+            };
             buffers = twgl.createBufferInfoFromArrays(drawingState.gl,arrays);
         }
 
@@ -97,24 +98,4 @@ var Deer = undefined;
 
 })();
 
-grobjects.push(new Deer("deer0",[0, 0, 0], 1.0) );
-
-
-//stolen from ../ExampleObjects/texturedplane.js
-//creates a gl texture from an image object. Sometiems the image is upside down so flipY is passed to optionally flip the data.
-//it's mostly going to be a try it once, flip if you need to. 
-var createGLTexture = function (gl, image, flipY) {
-    var texture = gl.createTexture();
-    gl.bindTexture(gl.TEXTURE_2D, texture);
-    if(flipY){
-        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-    }
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER,  gl.LINEAR);
-    gl.generateMipmap(gl.TEXTURE_2D);
-    gl.bindTexture(gl.TEXTURE_2D, null);
-    return texture;
-}
-
-
+grobjects.push(new Deer("deer0",[0, 1, 0], 8.0) );
