@@ -62,8 +62,7 @@ window.onload = function() {
     controls.style.width = (width-10) +"px";    // account for padding
     body.appendChild(controls);
     function cb() { dw.scheduleRedraw();}
-    //to be implemented
-    //var arclen = makeCheckBox("ArcLength",controls,cb);
+    var arclen = makeCheckBox("ArcLength",controls,cb);
     var asDots = makeCheckBox("AsDots",controls,cb);
 
     // this wires the pieces together
@@ -96,17 +95,47 @@ window.onload = function() {
             });
             ctx.stroke();
             ctx.restore();
+
+            for (var u = 0; u < cc.control_points.length; u += 0.1) {
+                ctx.save();
+                ctx.beginPath();
+                var point = cc.eval(cc.arclenToU(u));
+                ctx.translate(point[0], point[1]);
+                var dir = cc.eval_dir(cc.arclenToU(u));
+                var track_scale = 5;
+                ctx.moveTo(dir[1] * track_scale, -dir[0] * track_scale);
+                ctx.lineTo(-dir[1] * track_scale, dir[0] * track_scale);
+                ctx.stroke();
+                ctx.restore();
+            }
         }
 
         var t = ttc.getTime();
-        //to be implemented
-        //var pos = cc.eval(arclen.checked ? cc.arclenToU(t,true) : t );
-        var pos = cc.eval(t);
+        //in pixels
+        var train_length = 60;
+        //in t-units
+        var train_delta = 0.2;
+        var train_width = 12;
+        var pos_rear = cc.eval(arclen.checked ? cc.arclenToU(t, true) : t);
+        var pos_front = cc.eval(arclen.checked ? cc.arclenToU(t + train_delta, true) : t + train_delta);
+        var pos = [];
+        //because of the limitations of our drawing functions, we have to draw the train as a vertical rectangle
+        //then rotate it about its middle.
+        pos.push((pos_rear[0] + pos_front[0])/2);
+        pos.push((pos_rear[1] + pos_front[1])/2);
+        //the rotation is a bit tricky - we'll have to use inverse trig functions on a normalized direction vector
+        var x_dir = pos_front[0] - pos_rear[0];
+        var y_dir = pos_front[1] - pos_rear[1];
+        var norm_scale = Math.sqrt(x_dir*x_dir + y_dir*y_dir);
+        x_dir /= norm_scale;
+        var angle = Math.asin(x_dir);
+        if (y_dir < 0) angle *= -1;
 
         ctx.save();
         ctx.translate(pos[0],pos[1]);
+        ctx.rotate(-angle);
         ctx.beginPath();
-        ctx.rect(-6,-6,12,12);
+        ctx.rect(-train_width/2,-train_length/2,train_width,train_length);
         ctx.fillStyle = "blue";
         ctx.fill();
         ctx.restore();
