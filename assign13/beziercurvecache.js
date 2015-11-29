@@ -128,7 +128,40 @@ var linear_interpolate = function(point0, point1, t) {
     return [x,y];
 }
 
-//to be implemented
 CurveCache.prototype.arclenToU = function(u, v) {
-    return u;
+    //Idea: the arc length will always be slightly exceeded by the lengths of the line
+    //segments tracing it out at the halfway point (or any other point for that matter),
+    //and will always slightly exceed the length of a line directly from its starting
+    //point to its midpoint and directly from there to its endpoint.
+    //Average these two lengths and we get a pretty good idea for the length of the curve.
+
+    //First calculate the length of the curve (todo: do in resample())
+    //next, normalize it to the number of points (todo: also do in resample())
+    //do this for all segments individually
+    //u should be normalized to this value as well
+    //Find the number of segments preceding u (i.e., the largest number such that the normalized length
+    //of all segments up to that number is smaller than u); call this number n
+    //subtract this from u for u'
+    //u'/length(segment on which u will be found) + n = new_u
+    var i = -1;
+    var cum_seg_length = 0;
+
+    while (cum_seg_length < u) {
+        i++;
+        cum_seg_length += segment_length[i];
+    }
+    //u appears on the ith segment
+    //this length is still in cum_seg_length, so remove it
+    cum_seg_length -= segment_length[i];
+
+    //this tells us how far u extends into segment i
+    t = u - cum_seg_length;
+
+    //this isn't exactly t yet - we have to divide by the length of this segment
+    t /= segment_length[i];
+    //so t is now the fraction of the segment we have to travel - add that to the segment's length and we're in business!
+
+    //because javascript will try to concatenate them, I know it
+    return -(-i - t);
 }
+
