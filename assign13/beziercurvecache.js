@@ -129,6 +129,7 @@ var length = function(x,y) {
 
 //takes a parameter and gives the position of the curve at that point
 CurveCache.prototype.eval = function(u) {
+    u = u % this.control_points.length;
     var prior_point = this.control_points[parseInt(u)];
     var prior_aux_point = this.aux_control_points[2*parseInt(u)+1];
     var following_point;
@@ -152,6 +153,15 @@ CurveCache.prototype.eval = function(u) {
         following_point,
         t
     );
+}
+
+//returns a direction vector for the curve at point u
+//Not sure how useful this will actually be
+CurveCache.prototype.eval_dir = function(u) {
+    u = u % this.control_points.length;
+    var x_dir = this.eval(u + delta_u)[0] - this.eval(u)[0];
+    var y_dir = this.eval(u + delta_u)[1] - this.eval(u)[1];
+    return normalize([x_dir, y_dir]);
 }
 
 //provides a linear interpolation between two points given a
@@ -181,6 +191,7 @@ var linear_interpolate = function(point0, point1, t) {
 }
 
 CurveCache.prototype.arclenToU = function(u, v) {
+    u = u % this.control_points.length;
 
     //First calculate the length of the curve (todo: do in resample())
     //next, normalize it to the number of points (todo: also do in resample())
