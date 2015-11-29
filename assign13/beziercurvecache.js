@@ -2,6 +2,7 @@ var CurveCache = function() {
     this.control_points = null;
     this.samples = null;
     this.aux_control_points = null;
+    this.segment_length = null;
 }
 
 //our sampling increment
@@ -11,6 +12,7 @@ var delta_u = delta_t;
 //sets an array of samples with locations of the points
 CurveCache.prototype.resample = function() {
     this.samples = [];
+
     //create some aux points to help define the bezier curve
     //there must be two for each existing control point which are colinear
     //with the control point
@@ -57,6 +59,56 @@ CurveCache.prototype.resample = function() {
         this.aux_control_points.push(aux_point_1);
 
     }
+
+
+    //to make following calculations a bit easier
+    this.aux_control_points.push(this.aux_control_points[0]);
+    this.points = this.control_points.slice(0);
+    this.points.push(this.control_points[0]);
+
+
+    //calculate the length of the curve segments
+    //Idea: the arc length will always be slightly exceeded by the lengths of the line
+    //segments tracing it out at the halfway point (or any other point for that matter),
+    //and will always slightly exceed the length of a line directly from its starting
+    //point to its midpoint and directly from there to its endpoint.
+    //Average these two lengths and we get a pretty good idea for the length of the curve.
+    //we want the length of the whole arc to equal this.control_points.length, so normalize
+    //the segment lengths to add up to that when finished
+    this.segment_length = [];
+    var cum_seg_length = 0;
+    for (var i = 0; i < this.control_points.length; i++) {
+        var point0 = this.points[i];
+        var point1 = this.aux_control_points[2*i+1];
+        var point2 = this.aux_control_points[2*i+2];
+        var point3 = this.points[i + 1];
+
+        var t = 0.5;
+        var interp01 = linear_interpolate(point0, point1, t);
+        var interp12 = linear_interpolate(point1, point2, t);
+        var interp23 = linear_interpolate(point2, point3, t);
+        var interp012 = linear_interpolate(interp01, interp12, t);
+        var interp123 = linear_interpolate(interp12, interp23, t);
+        var interp0123 = linear_interpolate(interp012, interp123, t);
+
+        var length1 = dist(point0, interp01) +
+            dist(interp01, interp012) +
+            dist(interp012, interp123) +
+            dist(interp123, interp23) +
+            dist(interp23, point3);
+
+        var length2 = dist(point0, interp0123) + dist(interp0123, point3);
+
+        this.segment_length.push((length1 + length2)/2);
+        cum_seg_length += this.segment_length[i];
+    }
+    //we still need to scale the length to this.control_points.length
+    var scalar = cum_seg_length / this.control_points.length;
+    for (var i = 0; i < this.control_points.length; i++) {
+        this.segment_length[i] /= scalar;
+    }
+
+
     for (var u = 0; u < this.control_points.length; u += delta_u) {
         this.samples.push(this.eval(u));
     }
@@ -129,11 +181,6 @@ var linear_interpolate = function(point0, point1, t) {
 }
 
 CurveCache.prototype.arclenToU = function(u, v) {
-    //Idea: the arc length will always be slightly exceeded by the lengths of the line
-    //segments tracing it out at the halfway point (or any other point for that matter),
-    //and will always slightly exceed the length of a line directly from its starting
-    //point to its midpoint and directly from there to its endpoint.
-    //Average these two lengths and we get a pretty good idea for the length of the curve.
 
     //First calculate the length of the curve (todo: do in resample())
     //next, normalize it to the number of points (todo: also do in resample())
@@ -146,19 +193,19 @@ CurveCache.prototype.arclenToU = function(u, v) {
     var i = -1;
     var cum_seg_length = 0;
 
-    while (cum_seg_length < u) {
+    while (cum_seg_length <= u) {
         i++;
-        cum_seg_length += segment_length[i];
+        cum_seg_length += this.segment_length[i];
     }
     //u appears on the ith segment
     //this length is still in cum_seg_length, so remove it
-    cum_seg_length -= segment_length[i];
+    cum_seg_length -= this.segment_length[i];
 
     //this tells us how far u extends into segment i
-    t = u - cum_seg_length;
+    var t = u - cum_seg_length;
 
     //this isn't exactly t yet - we have to divide by the length of this segment
-    t /= segment_length[i];
+    t /= this.segment_length[i];
     //so t is now the fraction of the segment we have to travel - add that to the segment's length and we're in business!
 
     //because javascript will try to concatenate them, I know it
