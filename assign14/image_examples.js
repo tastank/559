@@ -140,20 +140,43 @@ processButtons.push(
     }
 );
 
-// push another function - this one creates a new image data
-// it would probably be better to make one that is the same size
-// as the source
+//Scales the image by a factor of 1/2 using bilinear sampling
 processButtons.push(
-    function redSquare(imageData) {
-        var newData = new ImageData(50,50);
-        var data = newData.data;
-        // this loops over pixels
-        for (var i = 0; i < data.length; i += 4) {
-            data[i]   = 255;
-            data[i+1] = 128;
-            data[i+2] = 128;
-            data[i+3] = 255;
+    function scaledown(imageData) {
+        var data = new ImageData(parseInt(0.5*imageData.width), parseInt(0.5*imageData.height));
+        for (var i = 0; i < data.width; i++) {
+            for (var j = 0; j < data.height; j++) {
+                var red = 0;
+                var green = 0;
+                var blue = 0;
+                //get other pixel values for bilinear sampling
+                for (var i_offset = 0; i_offset < 2; i_offset++) {
+                    for (var j_offset = 0; j_offset < 2; j_offset++) {
+                        var red2, green2, blue2;
+                        var i_inc = i_offset;
+                        var j_inc = j_offset;
+                        //prevent overflow
+                        if (i + i_offset == imageData.width) {
+                            i_inc = 0;
+                        }
+                        if (j + j_offset == imageData.height) {
+                            j_inc = 0;
+                        }
+                        red += imageData.data[get_index(imageData, 2*i + i_inc, 2*j + j_inc)];
+                        green += imageData.data[get_index(imageData, 2*i + i_inc, 2*j + j_inc) + 1];
+                        blue += imageData.data[get_index(imageData, 2*i + i_inc, 2*j + j_inc) + 2];
+                    }
+                }
+                red /= 4;
+                green /= 4;
+                blue /= 4;
+
+                data.data[get_index(data, i, j)] = parseInt(red);
+                data.data[get_index(data, i, j) + 1] = parseInt(green);
+                data.data[get_index(data, i, j) + 2] = parseInt(blue);
+                data.data[get_index(data, i, j) + 3] = 255;
+            }
         }
-        return newData;
+        return data;
     }
 );
