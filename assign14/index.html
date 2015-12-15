@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CS559 Image Processing Test</title>
+</head>
+<body>
+    <!-- this loads in the professor's testing code - you should make your
+         own functions. It will make an error for you, but that will be OK -->
+    <!--script src="image_gleicher.js"></script-->
+    <!-- these load the actual program in - image.js must be last
+         you might replace image_examples.js with your own file
+         or add another file that adds to what image_examples.js does
+         (this is what "image_gleicher.js" does) -->
+    <script src="image_examples.js"></script>
+    <script src="image.js"></script>
+    Desaturation: <input id="desaturation" type="range" min="0" max="1" step=".05" /><br />
+    Blur radius: <input id="blur_radius" type="range" min="0" max="9" step="1" /><br />
+    Blur strength: <input id="blur_strength" type="range" min="0" max="1" step=".05" /><br />
+</body>
+</html>
